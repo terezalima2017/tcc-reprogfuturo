@@ -1,0 +1,19 @@
+<div class="container py-4 fade-in-up">
+  <div class="auth-container" style="min-height: auto; padding: 1rem;">
+    <div class="auth-card" style="max-width: 500px;">
+      <div class="auth-icon">🏫</div>
+      <h2>Entrar em uma Turma</h2>
+      <p class="auth-subtitle">Digite o código de 6 caracteres fornecido pelo seu professor</p>
+      <form action="/aluno/entrar-turma" method="POST" class="eco-form">
+        <div class="mb-4">
+          <label for="codigo" class="form-label"><i class="bi bi-key me-1"></i>Código da Turma</label>
+          <input type="text" class="form-control text-center fw-bold" id="codigo" name="codigo"
+            placeholder="Ex: ABC123" required minlength="6" maxlength="6"
+            style="font-size: 1.5rem; letter-spacing: 5px; text-transform: uppercase;">
+        </div>
+        <button type="submit" class="btn btn-eco w-100 py-2"><i class="bi bi-door-open me-2"></i>Entrar na Turma</button>
+      </form>
+      <a href="/aluno/dashboard" class="btn btn-eco-secondary w-100 mt-3"><i class="bi bi-arrow-left me-2"></i>Voltar</a>
+    </div>
+  </div>
+</div>

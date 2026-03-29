@@ -1,0 +1,17 @@
+<div class="container py-4 fade-in-up">
+  <div class="auth-container" style="min-height: auto; padding: 1rem;">
+    <div class="auth-card" style="max-width: 500px;">
+      <div class="auth-icon">🏫</div>
+      <h2>Criar Nova Turma</h2>
+      <p class="auth-subtitle">Um código exclusivo será gerado automaticamente</p>
+      <form action="/professor/turmas" method="POST" class="eco-form">
+        <div class="mb-4">
+          <label for="nome" class="form-label"><i class="bi bi-pencil me-1"></i>Nome da Turma</label>
+          <input type="text" class="form-control" id="nome" name="nome" placeholder="Ex: 5° Ano A - Meio Ambiente" required minlength="2">
+        </div>
+        <button type="submit" class="btn btn-eco w-100 py-2"><i class="bi bi-plus-lg me-2"></i>Criar Turma</button>
+      </form>
+      <a href="/professor/turmas" class="btn btn-eco-secondary w-100 mt-3"><i class="bi bi-arrow-left me-2"></i>Voltar</a>
+    </div>
+  </div>
+</div>

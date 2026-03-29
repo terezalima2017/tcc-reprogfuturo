@@ -1,0 +1,32 @@
+<div class="container py-4 fade-in-up">
+  <h2 class="fw-bold mb-4"><i class="bi bi-clipboard-check me-2"></i>Avaliar Desafios Diários</h2>
+
+  {{#if evidencias.length}}
+  <div class="row g-4">
+    {{#each evidencias}}
+    <div class="col-md-6">
+      <div class="eco-card">
+        <div class="card-header d-flex justify-content-between">
+          <span><i class="bi bi-person me-1"></i>{{this.respostaAtividade.aluno.nome}}</span>
+          <span class="badge status-pendente">Pendente</span>
+        </div>
+        <div class="card-body">
+          <p class="small text-muted mb-1"><strong>Atividade:</strong> {{this.respostaAtividade.atividade.nome}}</p>
+          <p class="small text-muted mb-2"><strong>Turma:</strong> {{this.respostaAtividade.turma.nome}}</p>
+          <p class="small mb-0"><strong>Enviado em:</strong> {{formatDateTime this.createdAt}}</p>
+          <a href="/professor/desafios/{{this.id}}/avaliar" class="btn btn-eco btn-sm mt-3 w-100">
+            <i class="bi bi-eye me-1"></i>Avaliar
+          </a>
+        </div>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+  {{else}}
+  <div class="eco-card text-center p-5">
+    <div style="font-size:3rem;">✅</div>
+    <h5 class="mt-3 fw-bold">Nenhum desafio pendente!</h5>
+    <p class="text-muted">Todos os desafios foram avaliados.</p>
+  </div>
+  {{/if}}
+</div>

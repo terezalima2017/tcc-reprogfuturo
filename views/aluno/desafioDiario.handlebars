@@ -1,0 +1,47 @@
+<div class="container py-4 fade-in-up">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold mb-0">🌟 {{atividade.nome}}</h2>
+      <p class="text-muted mb-0">{{atividade.descricao}}</p>
+    </div>
+    <a href="/aluno/atividades" class="btn btn-eco-secondary"><i class="bi bi-arrow-left me-1"></i>Voltar</a>
+  </div>
+
+  {{#each atividade.tarefas}}
+  <div class="eco-card mb-4">
+    <div class="card-header"><i class="bi bi-star me-2"></i>Tarefa do Desafio</div>
+    <div class="card-body">
+      <p class="fs-5">{{this.descricaoTarefa}}</p>
+    </div>
+  </div>
+  {{/each}}
+
+  <div class="eco-card">
+    <div class="card-header"><i class="bi bi-camera me-2"></i>Enviar Evidência</div>
+    <div class="card-body">
+      <form action="/aluno/atividades/{{atividade.id}}/evidencia" method="POST" enctype="multipart/form-data" class="eco-form">
+        <div class="mb-3">
+          <label for="fotos" class="form-label">📸 Fotos (até 3 imagens)</label>
+          <input type="file" class="form-control" id="fotos" name="fotos" accept="image/*" multiple required>
+          <small class="text-muted">Envie fotos mostrando a realização da tarefa.</small>
+        </div>
+
+        <div class="mb-4">
+          <label for="relatorio" class="form-label">📝 Relatório Descritivo</label>
+          <textarea class="form-control" id="relatorio" name="relatorio" rows="5" required minlength="10"
+            placeholder="Explique o que você fez, como e onde a ação aconteceu. Descreva sua experiência!"></textarea>
+          <small class="text-muted">Mínimo de 10 caracteres. Conte detalhes sobre o que você fez!</small>
+        </div>
+
+        <button type="submit" class="btn btn-eco btn-lg w-100">
+          <i class="bi bi-send me-2"></i>Enviar Evidência
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="eco-card mt-4 text-center p-4" style="background: #fff3e0;">
+    <i class="bi bi-info-circle text-warning fs-4"></i>
+    <p class="mt-2 mb-0">Após o envio, o professor irá avaliar sua evidência. A pontuação será registrada após a aprovação.</p>
+  </div>
+</div>

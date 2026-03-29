@@ -1,0 +1,38 @@
+<div class="container py-4 fade-in-up">
+  <h2 class="fw-bold mb-4"><i class="bi bi-plus-circle me-2"></i>{{#if editando}}Editar Atividade{{else}}Criar Atividade Pronta{{/if}}</h2>
+  <div class="eco-card">
+    <div class="card-body">
+      <form action="{{#if editando}}/admin/atividades/{{atividade.id}}{{else}}/admin/atividades{{/if}}" method="POST" enctype="multipart/form-data" class="eco-form">
+        <div class="mb-3">
+          <label for="nome" class="form-label">Nome *</label>
+          <input type="text" class="form-control" id="nome" name="nome" value="{{#if editando}}{{atividade.nome}}{{/if}}" required>
+        </div>
+        <div class="mb-3">
+          <label for="descricao" class="form-label">Descrição *</label>
+          <textarea class="form-control" id="descricao" name="descricao" rows="3" required>{{#if editando}}{{atividade.descricao}}{{/if}}</textarea>
+        </div>
+        {{#unless editando}}
+        <div class="mb-3">
+          <label for="tipo" class="form-label">Tipo *</label>
+          <select class="form-select" id="tipo" name="tipo" required>
+            <option value="">Selecione</option>
+            <option value="lixo_misterioso">🗑️ Lixo Misterioso</option>
+            <option value="caca_palavras">🔍 Caça-Palavras</option>
+            <option value="verdadeiro_falso">✅ Verdadeiro ou Falso</option>
+            <option value="multipla_escolha">📝 Múltipla Escolha</option>
+            <option value="desafio_diario">🌟 Desafio Diário</option>
+          </select>
+        </div>
+        {{/unless}}
+        <div class="mb-4">
+          <label for="imagem" class="form-label">Imagem (opcional)</label>
+          <input type="file" class="form-control" id="imagem" name="imagem" accept="image/*">
+        </div>
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-eco"><i class="bi bi-check-lg me-2"></i>{{#if editando}}Salvar{{else}}Criar{{/if}}</button>
+          <a href="/admin/atividades" class="btn btn-eco-secondary">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

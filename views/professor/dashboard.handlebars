@@ -1,0 +1,89 @@
+<div class="container py-4 fade-in-up">
+  <h2 class="fw-bold mb-1"><i class="bi bi-speedometer2 me-2"></i>Dashboard do Professor</h2>
+  <p class="text-muted mb-4">Bem-vindo(a), {{usuario.nome}}! 🌿</p>
+
+  <div class="row g-4 mb-4">
+    <div class="col-md-3 col-6">
+      <div class="stat-card">
+        <div class="stat-icon">📚</div>
+        <div class="stat-number">{{totalTurmas}}</div>
+        <div class="stat-label">Turmas</div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="stat-card">
+        <div class="stat-icon">👨‍🎓</div>
+        <div class="stat-number">{{totalAlunos}}</div>
+        <div class="stat-label">Alunos</div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="stat-card">
+        <div class="stat-icon">🎮</div>
+        <div class="stat-number">{{totalAtividades}}</div>
+        <div class="stat-label">Atividades</div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-number">{{desafiosPendentes}}</div>
+        <div class="stat-label">Pendentes</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-md-4">
+      <a href="/professor/turmas/criar" class="text-decoration-none">
+        <div class="eco-card h-100 text-center p-4">
+          <div style="font-size: 2.5rem;">➕</div>
+          <h5 class="mt-2 fw-bold" style="color: #2D6A4F;">Criar Turma</h5>
+          <p class="text-muted small mb-0">Crie uma nova turma e compartilhe o código</p>
+        </div>
+      </a>
+    </div>
+    <div class="col-md-4">
+      <a href="/professor/atividades/criar" class="text-decoration-none">
+        <div class="eco-card h-100 text-center p-4">
+          <div style="font-size: 2.5rem;">🎯</div>
+          <h5 class="mt-2 fw-bold" style="color: #2D6A4F;">Criar Atividade</h5>
+          <p class="text-muted small mb-0">Crie jogos e desafios ambientais</p>
+        </div>
+      </a>
+    </div>
+    <div class="col-md-4">
+      <a href="/professor/relatorios" class="text-decoration-none">
+        <div class="eco-card h-100 text-center p-4">
+          <div style="font-size: 2.5rem;">📊</div>
+          <h5 class="mt-2 fw-bold" style="color: #2D6A4F;">Relatórios</h5>
+          <p class="text-muted small mb-0">Acompanhe o desempenho dos alunos</p>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  {{#if turmas.length}}
+  <div class="eco-card">
+    <div class="card-header"><i class="bi bi-people me-2"></i>Minhas Turmas</div>
+    <div class="card-body">
+      <div class="row g-3">
+        {{#each turmas}}
+        <div class="col-md-6">
+          <div class="d-flex justify-content-between align-items-center p-3 rounded" style="background: #f0faf0;">
+            <div>
+              <h6 class="fw-bold mb-1">{{this.nome}}</h6>
+              <span class="turma-codigo" style="padding: 0.3rem 0.8rem; font-size: 0.9rem;">
+                <span class="code" style="font-size: 1.1rem;">{{this.codigo}}</span>
+              </span>
+              <small class="d-block mt-1 text-muted">{{this.matriculas.length}} alunos</small>
+            </div>
+            <a href="/professor/turmas/{{this.id}}" class="btn btn-eco-secondary btn-sm">Ver</a>
+          </div>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+  {{/if}}
+</div>

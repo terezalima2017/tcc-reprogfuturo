@@ -1,0 +1,57 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-icon">🌱</div>
+    <h2>Criar Conta</h2>
+    <p class="auth-subtitle">Junte-se à nossa comunidade pela natureza</p>
+
+    <form action="/register" method="POST" class="eco-form" id="registerForm">
+      <div class="mb-3">
+        <label for="nome" class="form-label"><i class="bi bi-person me-1"></i>Nome completo</label>
+        <input type="text" class="form-control" id="nome" name="nome" placeholder="Seu nome" required minlength="2" maxlength="100">
+      </div>
+
+      <div class="mb-3">
+        <label for="email" class="form-label"><i class="bi bi-envelope me-1"></i>Email</label>
+        <input type="email" class="form-control" id="email" name="email" placeholder="seu@email.com" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="senha" class="form-label"><i class="bi bi-lock me-1"></i>Senha</label>
+        <input type="password" class="form-control" id="senha" name="senha" placeholder="Mínimo 6 caracteres" required minlength="6">
+      </div>
+
+      <div class="mb-3">
+        <label for="confirmarSenha" class="form-label"><i class="bi bi-lock-fill me-1"></i>Confirmar senha</label>
+        <input type="password" class="form-control" id="confirmarSenha" name="confirmarSenha" placeholder="Repita a senha" required>
+      </div>
+
+      <div class="mb-4">
+        <label for="tipo" class="form-label"><i class="bi bi-people me-1"></i>Eu sou...</label>
+        <select class="form-select" id="tipo" name="tipo" required>
+          <option value="">Selecione</option>
+          <option value="aluno">🎒 Aluno(a)</option>
+          <option value="professor">📚 Professor(a)</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-eco w-100 py-2" id="btnRegister">
+        <i class="bi bi-person-plus me-2"></i>Cadastrar
+      </button>
+    </form>
+
+    <p class="text-center mt-4 mb-0">
+      Já tem conta? <a href="/login" class="fw-bold" style="color: #2D6A4F;">Faça login</a>
+    </p>
+  </div>
+</div>
+
+<script>
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+  const senha = document.getElementById('senha').value;
+  const confirmar = document.getElementById('confirmarSenha').value;
+  if (senha !== confirmar) {
+    e.preventDefault();
+    alert('As senhas não coincidem!');
+  }
+});
+</script>

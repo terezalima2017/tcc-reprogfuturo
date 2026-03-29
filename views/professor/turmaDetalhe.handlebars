@@ -1,0 +1,67 @@
+<div class="container py-4 fade-in-up">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0"><i class="bi bi-people me-2"></i>{{turma.nome}}</h2>
+    <a href="/professor/turmas" class="btn btn-eco-secondary"><i class="bi bi-arrow-left me-2"></i>Voltar</a>
+  </div>
+
+  <div class="eco-card mb-4">
+    <div class="card-body text-center">
+      <h5 class="fw-bold mb-2">Código da Turma</h5>
+      <div class="turma-codigo">
+        <span class="code">{{turma.codigo}}</span>
+        <button class="btn-copy" data-code="{{turma.codigo}}"><i class="bi bi-clipboard"></i> Copiar</button>
+      </div>
+      <p class="small text-muted mt-2 mb-0">Compartilhe este código com seus alunos para que eles possam entrar na turma</p>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="eco-card h-100">
+        <div class="card-header"><i class="bi bi-people me-2"></i>Alunos ({{turma.matriculas.length}})</div>
+        <div class="card-body">
+          {{#if turma.matriculas.length}}
+          <div class="list-group list-group-flush">
+            {{#each turma.matriculas}}
+            <div class="list-group-item d-flex justify-content-between align-items-center border-0">
+              <div><i class="bi bi-person-circle me-2 text-muted"></i><strong>{{this.aluno.nome}}</strong>
+                <small class="d-block text-muted ms-4">{{this.aluno.email}}</small></div>
+              <span class="badge bg-eco">{{this.aluno.pontuacaoAcumulada}} pts</span>
+            </div>
+            {{/each}}
+          </div>
+          {{else}}
+          <p class="text-muted text-center py-3">Nenhum aluno matriculado ainda.</p>
+          {{/if}}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="eco-card h-100">
+        <div class="card-header"><i class="bi bi-controller me-2"></i>Atividades ({{turma.atividadesAssociadas.length}})</div>
+        <div class="card-body">
+          {{#if turma.atividadesAssociadas.length}}
+          {{#each turma.atividadesAssociadas}}
+          <div class="d-flex justify-content-between align-items-center p-2 mb-2 rounded" style="background: #f8f9fa;">
+            <div>
+              <span class="badge badge-tipo badge-{{this.atividade.tipo}} me-2">{{tipoAtividadeLabel this.atividade.tipo}}</span>
+              <strong>{{this.atividade.nome}}</strong>
+            </div>
+          </div>
+          {{/each}}
+          {{else}}
+          <p class="text-muted text-center py-3">Nenhuma atividade associada.</p>
+          {{/if}}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-4 text-end">
+    <form action="/professor/turmas/{{turma.id}}/excluir" method="POST" class="d-inline"
+      onsubmit="return confirm('Tem certeza que deseja excluir esta turma?')">
+      <button type="submit" class="btn btn-eco-danger"><i class="bi bi-trash me-1"></i>Excluir Turma</button>
+    </form>
+  </div>
+</div>

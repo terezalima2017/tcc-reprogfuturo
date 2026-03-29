@@ -1,0 +1,19 @@
+{{#if mensagemSucesso}}
+<div class="container mt-3">
+  <div class="alert alert-success alert-dismissible fade show eco-alert" role="alert">
+    <i class="bi bi-check-circle-fill me-2"></i>
+    {{{mensagemSucesso}}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+</div>
+{{/if}}
+
+{{#if mensagemErro}}
+<div class="container mt-3">
+  <div class="alert alert-danger alert-dismissible fade show eco-alert" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    {{{mensagemErro}}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+</div>
+{{/if}}

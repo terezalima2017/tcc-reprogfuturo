@@ -1,0 +1,59 @@
+<div class="container py-4 fade-in-up">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0"><i class="bi bi-graph-up me-2"></i>Relatório: {{turma.nome}}</h2>
+    <a href="/professor/relatorios" class="btn btn-eco-secondary"><i class="bi bi-arrow-left me-2"></i>Voltar</a>
+  </div>
+
+  <div class="eco-card mb-4">
+    <div class="card-body">
+      <p class="mb-1"><strong>Total de atividades da turma:</strong> {{totalAtividadesTurma}}</p>
+      <p class="mb-0"><strong>Total de alunos:</strong> {{relatorio.length}}</p>
+    </div>
+  </div>
+
+  {{#if relatorio.length}}
+  <div class="table-responsive">
+    <table class="table eco-table">
+      <thead>
+        <tr>
+          <th>Aluno</th>
+          <th>Pontuação Acumulada</th>
+          <th>Atividades Realizadas</th>
+          <th>Total Atividades</th>
+          <th>Pontuação Média</th>
+          <th>Participação</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each relatorio}}
+        <tr>
+          <td>
+            <strong>{{this.nome}}</strong>
+            <small class="d-block text-muted">{{this.email}}</small>
+          </td>
+          <td><span class="fw-bold">{{this.pontuacaoAcumulada}}</span> pts</td>
+          <td>{{this.atividadesRealizadas}}</td>
+          <td>{{this.totalAtividadesTurma}}</td>
+          <td>
+            <span class="fw-bold" style="color: {{#if (gte this.pontuacaoMedia 70)}}#2E7D32{{else if (gte this.pontuacaoMedia 50)}}#F57F17{{else}}#D32F2F{{/if}}">
+              {{this.pontuacaoMedia}}
+            </span>
+          </td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="progress flex-grow-1" style="height:20px;">
+                <div class="progress-bar" style="width:{{this.participacao}}%">{{this.participacao}}%</div>
+              </div>
+            </div>
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+  {{else}}
+  <div class="eco-card text-center p-5">
+    <p class="text-muted">Nenhum aluno matriculado nesta turma.</p>
+  </div>
+  {{/if}}
+</div>

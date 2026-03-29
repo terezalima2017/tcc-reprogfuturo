@@ -1,0 +1,27 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-icon">🌿</div>
+    <h2>Entrar</h2>
+    <p class="auth-subtitle">Acesse sua conta e continue sua jornada ambiental</p>
+
+    <form action="/login" method="POST" class="eco-form" id="loginForm">
+      <div class="mb-3">
+        <label for="email" class="form-label"><i class="bi bi-envelope me-1"></i>Email</label>
+        <input type="email" class="form-control" id="email" name="email" placeholder="seu@email.com" required>
+      </div>
+
+      <div class="mb-4">
+        <label for="senha" class="form-label"><i class="bi bi-lock me-1"></i>Senha</label>
+        <input type="password" class="form-control" id="senha" name="senha" placeholder="Sua senha" required minlength="6">
+      </div>
+
+      <button type="submit" class="btn btn-eco w-100 py-2" id="btnLogin">
+        <i class="bi bi-box-arrow-in-right me-2"></i>Entrar
+      </button>
+    </form>
+
+    <p class="text-center mt-4 mb-0">
+      Não tem conta? <a href="/register" class="fw-bold" style="color: #2D6A4F;">Cadastre-se aqui</a>
+    </p>
+  </div>
+</div>

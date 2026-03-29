@@ -1,0 +1,7 @@
+<div class="error-page">
+  <div class="error-code">{{statusCode}}</div>
+  <h2 class="mb-3">{{#if (eq statusCode 404)}}Página não encontrada{{else}}Oops! Algo deu errado{{/if}}</h2>
+  <p class="text-muted mb-4">{{message}}</p>
+  <div class="mb-4" style="font-size: 3rem;">🌿</div>
+  <a href="/" class="btn btn-eco"><i class="bi bi-house me-2"></i>Voltar ao início</a>
+</div>

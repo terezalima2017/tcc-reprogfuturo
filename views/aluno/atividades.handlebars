@@ -1,0 +1,47 @@
+<div class="container py-4 fade-in-up">
+  <h2 class="fw-bold mb-4"><i class="bi bi-controller me-2"></i>Minhas Atividades</h2>
+
+  {{#if atividades.length}}
+  <div class="row g-4">
+    {{#each atividades}}
+    <div class="col-md-6 col-lg-4">
+      <div class="eco-card h-100">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span class="badge badge-tipo badge-{{this.tipo}}">{{tipoAtividadeLabel this.tipo}}</span>
+          {{#if (eq this.status 'finalizada')}}
+            <span class="badge status-finalizada">✅ Finalizada</span>
+          {{else if (eq this.status 'em_andamento')}}
+            <span class="badge status-em_andamento">⏳ Em andamento</span>
+          {{else}}
+            <span class="badge status-pendente">📋 Pendente</span>
+          {{/if}}
+        </div>
+        <div class="card-body">
+          {{#if this.imagemUrl}}<img src="{{this.imagemUrl}}" alt="{{this.nome}}" class="img-fluid rounded mb-3" style="max-height:120px;">{{/if}}
+          <h5 class="fw-bold">{{this.nome}}</h5>
+          <p class="text-muted small">{{this.descricao}}</p>
+
+          {{#if (eq this.status 'finalizada')}}
+            <div class="text-center p-3 rounded" style="background:#f0faf0;">
+              <span style="font-size:2rem;">{{feedbackEmoji this.resposta.pontuacao}}</span>
+              <p class="fw-bold mb-0 mt-1" style="color:#2D6A4F;">{{this.resposta.pontuacao}} pontos</p>
+              <small class="text-muted">{{feedbackMensagem this.resposta.pontuacao}}</small>
+            </div>
+          {{else}}
+            <a href="/aluno/atividades/{{this.id}}/jogar" class="btn btn-eco w-100">
+              <i class="bi bi-play-fill me-1"></i>Jogar
+            </a>
+          {{/if}}
+        </div>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+  {{else}}
+  <div class="eco-card text-center p-5">
+    <div style="font-size:3rem;">📋</div>
+    <h5 class="mt-3 fw-bold">Nenhuma atividade disponível</h5>
+    <p class="text-muted">Aguarde o professor associar atividades à sua turma.</p>
+  </div>
+  {{/if}}
+</div>

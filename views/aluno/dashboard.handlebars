@@ -1,0 +1,114 @@
+<div class="container py-4 fade-in-up">
+  <h2 class="fw-bold mb-1"><i class="bi bi-speedometer2 me-2"></i>Meu Painel</h2>
+  <p class="text-muted mb-4">Olá, {{aluno.nome}}! 🌱</p>
+
+  {{#unless temTurma}}
+  <div class="eco-card text-center p-5 mb-4">
+    <div style="font-size: 4rem;">🏫</div>
+    <h4 class="fw-bold mt-3">Você ainda não está em uma turma</h4>
+    <p class="text-muted">Peça o código da turma ao seu professor e entre agora!</p>
+    <a href="/aluno/entrar-turma" class="btn btn-eco btn-lg mt-2">
+      <i class="bi bi-door-open me-2"></i>Entrar em uma turma
+    </a>
+  </div>
+  {{/unless}}
+
+  {{#if temTurma}}
+  <div class="row g-4 mb-4">
+    <div class="col-md-3 col-6">
+      <div class="stat-card">
+        <div class="stat-icon">⭐</div>
+        <div class="stat-number">{{aluno.pontuacaoAcumulada}}</div>
+        <div class="stat-label">Pontos</div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-number">{{atividadesRealizadas}}</div>
+        <div class="stat-label">Realizadas</div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="stat-card">
+        <div class="stat-icon">📋</div>
+        <div class="stat-number">{{atividadesPendentes}}</div>
+        <div class="stat-label">Pendentes</div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="stat-card">
+        <div class="stat-icon">🏫</div>
+        <div class="stat-number" style="font-size:1rem;">{{matricula.turma.nome}}</div>
+        <div class="stat-label">Turma</div>
+      </div>
+    </div>
+  </div>
+
+  {{#if totalAtividades}}
+  <div class="eco-card mb-4">
+    <div class="card-body">
+      <h6 class="fw-bold mb-2">Progresso Geral</h6>
+      <div class="progress" style="height: 25px;">
+        <div class="progress-bar" role="progressbar"
+          style="width: {{porcentagem atividadesRealizadas totalAtividades}}%;">
+          {{porcentagem atividadesRealizadas totalAtividades}}%
+        </div>
+      </div>
+    </div>
+  </div>
+  {{/if}}
+
+  <div class="row g-4 mb-4">
+    <div class="col-md-6">
+      <a href="/aluno/atividades" class="text-decoration-none">
+        <div class="eco-card text-center p-4 h-100">
+          <div style="font-size: 2.5rem;">🎮</div>
+          <h5 class="fw-bold mt-2" style="color: #2D6A4F;">Minhas Atividades</h5>
+          <p class="text-muted small mb-0">Veja e responda as atividades da sua turma</p>
+        </div>
+      </a>
+    </div>
+    <div class="col-md-6">
+      <a href="/aluno/perfil" class="text-decoration-none">
+        <div class="eco-card text-center p-4 h-100">
+          <div style="font-size: 2.5rem;">👤</div>
+          <h5 class="fw-bold mt-2" style="color: #2D6A4F;">Meu Perfil</h5>
+          <p class="text-muted small mb-0">Veja sua pontuação e histórico</p>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  {{#if certificadoDisponivel}}
+  <div class="eco-card text-center p-4" style="background: linear-gradient(135deg, #fff9c4, #f0f4c3); border: 2px solid #F9A825;">
+    <div style="font-size: 3rem;">🏆</div>
+    <h4 class="fw-bold mt-2" style="color: #F57F17;">Parabéns! Seu certificado está disponível!</h4>
+    <a href="/aluno/certificado" class="btn btn-eco mt-2">
+      <i class="bi bi-award me-2"></i>Ver Certificado
+    </a>
+  </div>
+  {{/if}}
+
+  {{#if ultimasRespostas.length}}
+  <div class="eco-card mt-4">
+    <div class="card-header"><i class="bi bi-clock-history me-2"></i>Últimas Atividades</div>
+    <div class="card-body">
+      {{#each ultimasRespostas}}
+      <div class="d-flex justify-content-between align-items-center p-2 mb-2 rounded" style="background: #f8f9fa;">
+        <div>
+          <span class="badge badge-tipo badge-{{this.atividade.tipo}} me-2">{{tipoAtividadeLabel this.atividade.tipo}}</span>
+          <strong>{{this.atividade.nome}}</strong>
+        </div>
+        <div>
+          <span class="fw-bold" style="color: {{#if (gte this.pontuacao 70)}}#2E7D32{{else}}#E65100{{/if}}">
+            {{feedbackEmoji this.pontuacao}} {{this.pontuacao}} pts
+          </span>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+  {{/if}}
+  {{/if}}
+</div>

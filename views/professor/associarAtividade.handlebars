@@ -1,0 +1,32 @@
+<div class="container py-4 fade-in-up">
+  <h2 class="fw-bold mb-4"><i class="bi bi-link-45deg me-2"></i>Associar "{{atividade.nome}}" a Turmas</h2>
+  <form action="/professor/atividades/{{atividade.id}}/associar" method="POST" class="eco-form">
+    <div class="eco-card mb-4">
+      <div class="card-body">
+        {{#if turmas.length}}
+        <div class="row g-3">
+          {{#each turmas}}
+          <div class="col-md-6">
+            <div class="form-check p-3 rounded {{#if this.jaAssociada}}opacity-50{{/if}}" style="background:#f8f9fa;">
+              <input class="form-check-input" type="checkbox" name="turmaIds" value="{{this.id}}" id="turma{{this.id}}" {{#if this.jaAssociada}}checked disabled{{/if}}>
+              <label class="form-check-label fw-bold" for="turma{{this.id}}">
+                {{this.nome}} <small class="text-muted">({{this.codigo}} - {{this.matriculas.length}} alunos)</small>
+                {{#if this.jaAssociada}}<span class="badge bg-eco ms-2">Já associada</span>{{/if}}
+              </label>
+            </div>
+          </div>
+          {{/each}}
+        </div>
+        {{else}}
+        <p class="text-muted text-center">Você não possui turmas. <a href="/professor/turmas/criar">Crie uma turma</a> primeiro.</p>
+        {{/if}}
+      </div>
+    </div>
+    {{#if turmas.length}}
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-eco"><i class="bi bi-check-lg me-2"></i>Associar</button>
+      <a href="/professor/atividades/{{atividade.id}}" class="btn btn-eco-secondary">Cancelar</a>
+    </div>
+    {{/if}}
+  </form>
+</div>

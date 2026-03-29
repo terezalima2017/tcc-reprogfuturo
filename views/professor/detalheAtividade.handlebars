@@ -1,0 +1,196 @@
+<div class="container py-4 fade-in-up">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold mb-0">{{atividade.nome}}</h2>
+      <span class="badge badge-tipo badge-{{atividade.tipo}} mt-1">{{tipoAtividadeLabel atividade.tipo}}</span>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="/professor/atividades/{{atividade.id}}/associar" class="btn btn-eco"><i class="bi bi-link-45deg me-1"></i>Associar a Turmas</a>
+      <a href="/professor/atividades/{{atividade.id}}/editar" class="btn btn-eco-secondary"><i class="bi bi-pencil me-1"></i>Editar</a>
+      <a href="/professor/atividades" class="btn btn-eco-secondary"><i class="bi bi-arrow-left me-1"></i>Voltar</a>
+    </div>
+  </div>
+
+  <div class="eco-card mb-4">
+    <div class="card-body">
+      <p>{{atividade.descricao}}</p>
+      {{#if atividade.imagemUrl}}<img src="{{atividade.imagemUrl}}" alt="Imagem da atividade" class="img-fluid rounded" style="max-height:200px;">{{/if}}
+    </div>
+  </div>
+
+  {{#if atividade.turmasAssociadas.length}}
+  <div class="eco-card mb-4">
+    <div class="card-header"><i class="bi bi-people me-2"></i>Turmas Associadas</div>
+    <div class="card-body">
+      {{#each atividade.turmasAssociadas}}
+      <span class="badge bg-eco me-2 mb-1 p-2">{{this.turma.nome}} ({{this.turma.codigo}})</span>
+      {{/each}}
+    </div>
+  </div>
+  {{/if}}
+
+  <!-- Formulário para adicionar itens -->
+  <div class="eco-card mb-4">
+    <div class="card-header"><i class="bi bi-plus-circle me-2"></i>Adicionar Item</div>
+    <div class="card-body">
+      <form action="/professor/atividades/{{atividade.id}}/item" method="POST" enctype="multipart/form-data" class="eco-form">
+
+        {{#if (eq atividade.tipo 'lixo_misterioso')}}
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">Nome do Lixo</label>
+            <input type="text" class="form-control" name="nomeLixo" required placeholder="Ex: Garrafa PET">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Foto do Lixo</label>
+            <input type="file" class="form-control" name="imagemLixo" accept="image/*">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Lixeira Correta</label>
+            <select class="form-select" name="lixeiraCorreta" required>
+              <option value="azul">🔵 Azul (Papel)</option>
+              <option value="vermelho">🔴 Vermelho (Plástico)</option>
+              <option value="verde">🟢 Verde (Vidro)</option>
+              <option value="amarelo">🟡 Amarelo (Metal)</option>
+              <option value="marrom">🟤 Marrom (Orgânico)</option>
+            </select>
+          </div>
+        </div>
+        {{/if}}
+
+        {{#if (eq atividade.tipo 'caca_palavras')}}
+        <div class="row g-3">
+          <div class="col-md-8">
+            <label class="form-label">Palavra</label>
+            <input type="text" class="form-control" name="palavra" required placeholder="Ex: RECICLAGEM" style="text-transform:uppercase;">
+          </div>
+        </div>
+        {{/if}}
+
+        {{#if (eq atividade.tipo 'verdadeiro_falso')}}
+        <div class="row g-3">
+          <div class="col-md-8">
+            <label class="form-label">Afirmação</label>
+            <textarea class="form-control" name="afirmacao" required placeholder="Ex: O plástico demora mais de 400 anos para se decompor."></textarea>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Resposta Correta</label>
+            <select class="form-select" name="resposta" required>
+              <option value="true">✅ Verdadeiro</option>
+              <option value="false">❌ Falso</option>
+            </select>
+          </div>
+        </div>
+        {{/if}}
+
+        {{#if (eq atividade.tipo 'multipla_escolha')}}
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">Enunciado</label>
+            <textarea class="form-control" name="enunciado" required placeholder="Pergunta..."></textarea>
+          </div>
+          <div class="col-md-6"><label class="form-label">A)</label><input type="text" class="form-control" name="alternativaA" required></div>
+          <div class="col-md-6"><label class="form-label">B)</label><input type="text" class="form-control" name="alternativaB" required></div>
+          <div class="col-md-6"><label class="form-label">C)</label><input type="text" class="form-control" name="alternativaC" required></div>
+          <div class="col-md-6"><label class="form-label">D)</label><input type="text" class="form-control" name="alternativaD" required></div>
+          <div class="col-md-6"><label class="form-label">E) (opcional)</label><input type="text" class="form-control" name="alternativaE"></div>
+          <div class="col-md-6">
+            <label class="form-label">Resposta Correta</label>
+            <select class="form-select" name="respostaCorreta" required>
+              <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option>
+            </select>
+          </div>
+        </div>
+        {{/if}}
+
+        {{#if (eq atividade.tipo 'desafio_diario')}}
+        <div>
+          <label class="form-label">Descrição da Tarefa</label>
+          <textarea class="form-control" name="descricaoTarefa" required rows="3" placeholder="Ex: Separe o lixo reciclável na sua casa."></textarea>
+        </div>
+        {{/if}}
+
+        <button type="submit" class="btn btn-eco mt-3"><i class="bi bi-plus-lg me-2"></i>Adicionar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Lista de itens existentes -->
+  <div class="eco-card">
+    <div class="card-header"><i class="bi bi-list-ul me-2"></i>Itens da Atividade</div>
+    <div class="card-body">
+      {{#if (eq atividade.tipo 'lixo_misterioso')}}
+        {{#each atividade.itensLixo}}
+        <div class="d-flex justify-content-between align-items-center p-2 mb-2 rounded" style="background:#f8f9fa;">
+          <div class="d-flex align-items-center gap-3">
+            {{#if this.imagemUrl}}<img src="{{this.imagemUrl}}" alt="{{this.nomeLixo}}" style="width:50px;height:50px;object-fit:cover;border-radius:8px;">{{/if}}
+            <div><strong>{{this.nomeLixo}}</strong><br><small style="color:{{corLixeira this.lixeiraCorreta}}">● {{nomeLixeira this.lixeiraCorreta}}</small></div>
+          </div>
+          <form action="/professor/atividades/{{../atividade.id}}/item/{{this.id}}/excluir" method="POST" onsubmit="return confirm('Excluir item?')">
+            <button class="btn btn-eco-danger btn-sm"><i class="bi bi-trash"></i></button>
+          </form>
+        </div>
+        {{else}}<p class="text-muted">Nenhum item adicionado.</p>{{/each}}
+      {{/if}}
+
+      {{#if (eq atividade.tipo 'caca_palavras')}}
+        <div class="d-flex flex-wrap gap-2">
+        {{#each atividade.palavras}}
+          <div class="d-inline-flex align-items-center gap-2 p-2 rounded" style="background:#f8f9fa;">
+            <strong>{{this.palavra}}</strong>
+            <form action="/professor/atividades/{{../atividade.id}}/item/{{this.id}}/excluir" method="POST" class="d-inline" onsubmit="return confirm('Excluir?')">
+              <button class="btn btn-eco-danger btn-sm py-0"><i class="bi bi-x"></i></button>
+            </form>
+          </div>
+        {{else}}<p class="text-muted">Nenhuma palavra adicionada.</p>{{/each}}
+        </div>
+      {{/if}}
+
+      {{#if (eq atividade.tipo 'verdadeiro_falso')}}
+        {{#each atividade.afirmacoes}}
+        <div class="d-flex justify-content-between align-items-center p-2 mb-2 rounded" style="background:#f8f9fa;">
+          <div><p class="mb-0">{{this.afirmacao}}</p><small class="{{#if this.resposta}}text-success{{else}}text-danger{{/if}} fw-bold">{{#if this.resposta}}Verdadeiro{{else}}Falso{{/if}}</small></div>
+          <form action="/professor/atividades/{{../atividade.id}}/item/{{this.id}}/excluir" method="POST" onsubmit="return confirm('Excluir?')">
+            <button class="btn btn-eco-danger btn-sm"><i class="bi bi-trash"></i></button>
+          </form>
+        </div>
+        {{else}}<p class="text-muted">Nenhuma afirmação adicionada.</p>{{/each}}
+      {{/if}}
+
+      {{#if (eq atividade.tipo 'multipla_escolha')}}
+        {{#each atividade.questoes}}
+        <div class="p-3 mb-3 rounded" style="background:#f8f9fa;">
+          <strong>{{this.enunciado}}</strong>
+          <div class="mt-2 small">
+            <div class="{{#if (eq this.respostaCorreta 'A')}}text-success fw-bold{{/if}}">A) {{this.alternativaA}}</div>
+            <div class="{{#if (eq this.respostaCorreta 'B')}}text-success fw-bold{{/if}}">B) {{this.alternativaB}}</div>
+            <div class="{{#if (eq this.respostaCorreta 'C')}}text-success fw-bold{{/if}}">C) {{this.alternativaC}}</div>
+            <div class="{{#if (eq this.respostaCorreta 'D')}}text-success fw-bold{{/if}}">D) {{this.alternativaD}}</div>
+            {{#if this.alternativaE}}<div class="{{#if (eq this.respostaCorreta 'E')}}text-success fw-bold{{/if}}">E) {{this.alternativaE}}</div>{{/if}}
+          </div>
+          <form action="/professor/atividades/{{../atividade.id}}/item/{{this.id}}/excluir" method="POST" class="mt-2" onsubmit="return confirm('Excluir?')">
+            <button class="btn btn-eco-danger btn-sm"><i class="bi bi-trash me-1"></i>Excluir</button>
+          </form>
+        </div>
+        {{else}}<p class="text-muted">Nenhuma questão adicionada.</p>{{/each}}
+      {{/if}}
+
+      {{#if (eq atividade.tipo 'desafio_diario')}}
+        {{#each atividade.tarefas}}
+        <div class="d-flex justify-content-between align-items-center p-2 mb-2 rounded" style="background:#f8f9fa;">
+          <p class="mb-0">{{this.descricaoTarefa}}</p>
+          <form action="/professor/atividades/{{../atividade.id}}/item/{{this.id}}/excluir" method="POST" onsubmit="return confirm('Excluir?')">
+            <button class="btn btn-eco-danger btn-sm"><i class="bi bi-trash"></i></button>
+          </form>
+        </div>
+        {{else}}<p class="text-muted">Nenhuma tarefa adicionada.</p>{{/each}}
+      {{/if}}
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <form action="/professor/atividades/{{atividade.id}}/excluir" method="POST" class="d-inline" onsubmit="return confirm('Excluir atividade e todos os itens?')">
+      <button class="btn btn-eco-danger"><i class="bi bi-trash me-1"></i>Excluir Atividade</button>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,122 @@
+<div class="container py-4 fade-in-up">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold mb-0">🗑️ {{atividade.nome}}</h2>
+      <p class="text-muted mb-0">{{atividade.descricao}}</p>
+    </div>
+    <a href="/aluno/atividades" class="btn btn-eco-secondary"><i class="bi bi-arrow-left me-1"></i>Voltar</a>
+  </div>
+
+  <div id="jogoLixo" data-atividade-id="{{atividade.id}}" data-turma-id="{{turmaId}}">
+    <div class="eco-card mb-4">
+      <div class="card-header text-center">
+        <h5 class="mb-0 fw-bold">Arraste cada lixo para a lixeira correta!</h5>
+      </div>
+      <div class="card-body">
+        <!-- Lixeiras -->
+        <div class="lixeira-container mb-4">
+          <div class="lixeira lixeira-azul" data-cor="azul">
+            <div style="font-size:2rem;">🔵</div>
+            <span>Papel</span>
+          </div>
+          <div class="lixeira lixeira-vermelho" data-cor="vermelho">
+            <div style="font-size:2rem;">🔴</div>
+            <span>Plástico</span>
+          </div>
+          <div class="lixeira lixeira-verde" data-cor="verde">
+            <div style="font-size:2rem;">🟢</div>
+            <span>Vidro</span>
+          </div>
+          <div class="lixeira lixeira-amarelo" data-cor="amarelo">
+            <div style="font-size:2rem;">🟡</div>
+            <span>Metal</span>
+          </div>
+          <div class="lixeira lixeira-marrom" data-cor="marrom">
+            <div style="font-size:2rem;">🟤</div>
+            <span>Orgânico</span>
+          </div>
+        </div>
+
+        <!-- Itens de lixo -->
+        <div id="itensContainer" class="row g-3 justify-content-center"></div>
+
+        <div id="resultadoContainer" class="text-center mt-4" style="display:none;">
+          <button id="btnFinalizar" class="btn btn-eco btn-lg"><i class="bi bi-check-lg me-2"></i>Finalizar Atividade</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{> feedbackModal}}
+
+<script>
+const itens = {{{itensJSON}}};
+const atividadeId = '{{atividade.id}}';
+const turmaId = '{{turmaId}}';
+const respostas = {};
+let itemAtual = 0;
+let lixeiraSelecionada = null;
+
+function renderItem() {
+  const container = document.getElementById('itensContainer');
+  if (itemAtual >= itens.length) {
+    document.getElementById('resultadoContainer').style.display = 'block';
+    return;
+  }
+  const item = itens[itemAtual];
+  container.innerHTML = `
+    <div class="col-md-6">
+      <div class="lixo-item" id="lixoItem-${item.id}">
+        ${item.imagemUrl ? `<img src="${item.imagemUrl}" alt="${item.nomeLixo}" class="mb-2">` : `<div style="font-size:3rem;">🗑️</div>`}
+        <h5 class="fw-bold mt-2">${item.nomeLixo}</h5>
+        <p class="text-muted small">Item ${itemAtual + 1} de ${itens.length}</p>
+        <p class="text-muted small">Clique na lixeira correta acima!</p>
+      </div>
+    </div>
+  `;
+}
+
+document.querySelectorAll('.lixeira').forEach(lixeira => {
+  lixeira.addEventListener('click', function() {
+    if (itemAtual >= itens.length) return;
+    const cor = this.dataset.cor;
+    const item = itens[itemAtual];
+    respostas[item.id] = cor;
+
+    const el = document.getElementById(`lixoItem-${item.id}`);
+    if (cor === item.lixeiraCorreta) {
+      el.classList.add('correto');
+    } else {
+      el.classList.add('incorreto');
+    }
+
+    setTimeout(() => {
+      itemAtual++;
+      renderItem();
+    }, 800);
+  });
+});
+
+document.getElementById('btnFinalizar').addEventListener('click', async function() {
+  this.disabled = true;
+  this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enviando...';
+  try {
+    const resp = await fetch(`/aluno/atividades/${atividadeId}/responder`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ respostas, turmaId })
+    });
+    const data = await resp.json();
+    if (data.sucesso) {
+      mostrarFeedback(data.pontuacao, data.feedback);
+    }
+  } catch (err) {
+    alert('Erro ao enviar respostas.');
+    this.disabled = false;
+    this.innerHTML = '<i class="bi bi-check-lg me-2"></i>Finalizar Atividade';
+  }
+});
+
+renderItem();
+</script>

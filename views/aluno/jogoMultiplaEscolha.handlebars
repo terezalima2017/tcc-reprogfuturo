@@ -1,0 +1,102 @@
+<div class="container py-4 fade-in-up">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold mb-0">📝 {{atividade.nome}}</h2>
+      <p class="text-muted mb-0">{{atividade.descricao}}</p>
+    </div>
+    <a href="/aluno/atividades" class="btn btn-eco-secondary"><i class="bi bi-arrow-left me-1"></i>Voltar</a>
+  </div>
+
+  <div class="text-center mb-3">
+    <span class="badge bg-eco p-2 fs-6" id="progresso">Questão 1 de {{atividade.questoes.length}}</span>
+  </div>
+
+  <div id="mcContainer"></div>
+
+  <div class="d-flex justify-content-center gap-3 mt-4">
+    <button id="btnAnterior" class="btn btn-eco-secondary" onclick="anterior()" style="display:none;">
+      <i class="bi bi-arrow-left me-1"></i>Anterior
+    </button>
+    <button id="btnProxima" class="btn btn-eco" onclick="proxima()">
+      Próxima <i class="bi bi-arrow-right ms-1"></i>
+    </button>
+    <button id="btnFinalizar" class="btn btn-eco btn-lg" style="display:none;">
+      <i class="bi bi-check-lg me-2"></i>Finalizar
+    </button>
+  </div>
+</div>
+
+{{> feedbackModal}}
+
+<script>
+const questoes = {{{questoesJSON}}};
+const atividadeId = '{{atividade.id}}';
+const turmaId = '{{turmaId}}';
+const respostas = {};
+let atual = 0;
+
+function renderQuestao() {
+  const q = questoes[atual];
+  document.getElementById('progresso').textContent = `Questão ${atual + 1} de ${questoes.length}`;
+
+  const letras = ['A', 'B', 'C', 'D', 'E'];
+  const alternativas = [q.alternativaA, q.alternativaB, q.alternativaC, q.alternativaD];
+  if (q.alternativaE) alternativas.push(q.alternativaE);
+
+  let html = `<div class="eco-card"><div class="card-body">
+    <h5 class="fw-bold mb-4">${q.enunciado}</h5>`;
+
+  alternativas.forEach((alt, i) => {
+    const letra = letras[i];
+    const selected = respostas[q.id] === letra ? 'selected' : '';
+    html += `
+      <div class="mc-alternativa ${selected}" onclick="selecionarAlternativa(${q.id}, '${letra}', this)">
+        <span class="mc-letra">${letra}</span>
+        <span>${alt}</span>
+      </div>`;
+  });
+
+  html += '</div></div>';
+  document.getElementById('mcContainer').innerHTML = html;
+
+  document.getElementById('btnAnterior').style.display = atual > 0 ? 'inline-block' : 'none';
+  document.getElementById('btnProxima').style.display = atual < questoes.length - 1 ? 'inline-block' : 'none';
+  document.getElementById('btnFinalizar').style.display = atual === questoes.length - 1 ? 'inline-block' : 'none';
+}
+
+function selecionarAlternativa(qId, letra, el) {
+  respostas[qId] = letra;
+  document.querySelectorAll('.mc-alternativa').forEach(a => a.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function proxima() {
+  if (atual < questoes.length - 1) { atual++; renderQuestao(); }
+}
+
+function anterior() {
+  if (atual > 0) { atual--; renderQuestao(); }
+}
+
+document.getElementById('btnFinalizar').addEventListener('click', async function() {
+  const naoRespondidas = questoes.filter(q => !respostas[q.id]).length;
+  if (naoRespondidas > 0 && !confirm(`Você tem ${naoRespondidas} questão(ões) sem resposta. Deseja finalizar mesmo assim?`)) return;
+
+  this.disabled = true;
+  this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enviando...';
+  try {
+    const resp = await fetch(`/aluno/atividades/${atividadeId}/responder`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ respostas, turmaId })
+    });
+    const data = await resp.json();
+    if (data.sucesso) mostrarFeedback(data.pontuacao, data.feedback);
+  } catch (err) {
+    alert('Erro ao enviar.');
+    this.disabled = false;
+  }
+});
+
+renderQuestao();
+</script>
