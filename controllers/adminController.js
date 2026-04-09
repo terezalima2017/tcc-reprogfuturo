@@ -150,7 +150,7 @@ const adminController = {
         case 'lixo_misterioso': {
           const { nomeLixo, lixeiraCorreta } = req.body;
           let imagemUrl = '';
-          if (req.file) imagemUrl = '/uploads/lixos/' + req.file.filename;
+          if (req.file) imagemUrl = '/uploads/atividades/' + req.file.filename;
           await LixoMisterioso.create({ atividadeId, nomeLixo, imagemUrl, lixeiraCorreta });
           break;
         }

@@ -438,7 +438,7 @@ const professorController = {
           const { nomeLixo, lixeiraCorreta } = req.body;
           let imagemUrl = '';
           if (req.file) {
-            imagemUrl = '/uploads/lixos/' + req.file.filename;
+            imagemUrl = '/uploads/atividades/' + req.file.filename;
           }
           await LixoMisterioso.create({ atividadeId, nomeLixo, imagemUrl, lixeiraCorreta });
           break;
