@@ -9,6 +9,10 @@ router.use(isAuthenticated, isAdmin);
 // Dashboard
 router.get('/dashboard', adminController.dashboard);
 
+// Gerenciar usuários
+router.get('/usuarios', adminController.listarUsuarios);
+router.post('/usuarios/:id/senha', adminController.alterarSenhaUsuario);
+
 // Gerenciar atividades template
 router.get('/atividades', adminController.listarAtividades);
 router.get('/atividades/criar', adminController.formCriarAtividade);

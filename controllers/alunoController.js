@@ -118,12 +118,26 @@ const alunoController = {
       const viewData = { title: atividade.nome, atividade: atividadeJson, turmaId: matricula.turmaId };
       if (atividade.tipo === 'caca_palavras' && atividadeJson.palavras.length > 0) {
         const palavras = atividadeJson.palavras.map(p => p.palavra);
-        viewData.grade = cacaPalavrasService.gerarGrade(palavras, 15);
+        const tamGrade = cacaPalavrasService.calcularTamanhoGrade(palavras);
+        viewData.grade = cacaPalavrasService.gerarGrade(palavras, tamGrade);
+        viewData.tamGrade = tamGrade;
         viewData.palavrasJSON = JSON.stringify(palavras);
         viewData.gradeJSON = JSON.stringify(viewData.grade);
       }
-      if (atividade.tipo === 'lixo_misterioso') viewData.itensJSON = JSON.stringify(atividadeJson.itensLixo);
-      if (atividade.tipo === 'verdadeiro_falso') viewData.afirmacoesJSON = JSON.stringify(atividadeJson.afirmacoes);
+      if (atividade.tipo === 'lixo_misterioso') {
+        const itensFiltrados = (atividadeJson.itensLixo || []).map(item => {
+          const { lixeiraCorreta, ...rest } = item;
+          return rest;
+        });
+        viewData.itensJSON = JSON.stringify(itensFiltrados);
+      }
+      if (atividade.tipo === 'verdadeiro_falso') {
+        const afirmacoesFiltradas = (atividadeJson.afirmacoes || []).map(af => {
+          const { resposta, ...rest } = af;
+          return rest;
+        });
+        viewData.afirmacoesJSON = JSON.stringify(afirmacoesFiltradas);
+      }
       if (atividade.tipo === 'multipla_escolha') viewData.questoesJSON = JSON.stringify(atividadeJson.questoes);
       res.render(viewMap[atividade.tipo], viewData);
     } catch (error) {

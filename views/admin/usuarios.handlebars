@@ -1,0 +1,111 @@
+<div class="container py-4 fade-in-up">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold mb-0"><i class="bi bi-people me-2"></i>Gerenciar Usuários</h2>
+      <p class="text-muted mb-0">Lista de usuários cadastrados no sistema.</p>
+    </div>
+    <a href="/admin/dashboard" class="btn btn-eco-secondary"><i class="bi bi-arrow-left me-1"></i>Voltar</a>
+  </div>
+
+  <div class="eco-card">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Email</th>
+              <th>Tipo</th>
+              <th class="text-end">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each usuarios}}
+            <tr>
+              <td><i class="bi bi-person-circle me-2 text-muted"></i>{{this.nome}}</td>
+              <td>{{this.email}}</td>
+              <td><span class="badge bg-eco">{{this.tipo}}</span></td>
+              <td class="text-end">
+                <button type="button" class="btn btn-sm btn-eco-secondary" data-bs-toggle="modal" data-bs-target="#modalSenha{{this.id}}">
+                  <i class="bi bi-key me-1"></i>Alterar Senha
+                </button>
+              </td>
+            </tr>
+
+            {{else}}
+            <tr>
+              <td colspan="4" class="text-center text-muted py-4">Nenhum usuário cadastrado.</td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modais de Alteração de Senha -->
+{{#each usuarios}}
+<div class="modal fade" id="modalSenha{{this.id}}" tabindex="-1" aria-labelledby="modalSenhaLabel{{this.id}}" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="/admin/usuarios/{{this.id}}/senha" method="POST">
+        <div class="modal-header text-start">
+          <h5 class="modal-title" id="modalSenhaLabel{{this.id}}"><i class="bi bi-key me-2"></i>Alterar Senha de {{this.nome}}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-start">
+          <div class="mb-3">
+            <label class="form-label">Nome</label>
+            <input type="text" class="form-control" value="{{this.nome}}" readonly>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">E-mail</label>
+            <input type="email" class="form-control" value="{{this.email}}" readonly>
+          </div>
+          <div class="mb-3">
+            <label for="novaSenha{{this.id}}" class="form-label">Nova Senha</label>
+            <input type="password" class="form-control" id="novaSenha{{this.id}}" name="novaSenha" required minlength="8" placeholder="Mínimo 8 caracteres">
+          </div>
+          <div class="mb-3">
+            <label for="confirmarSenha{{this.id}}" class="form-label">Confirmar Nova Senha</label>
+            <input type="password" class="form-control" id="confirmarSenha{{this.id}}" name="confirmarSenha" required minlength="8" placeholder="Digite a nova senha novamente">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-eco-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-eco">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{{/each}}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const forms = document.querySelectorAll('form[action^="/admin/usuarios/"]');
+  forms.forEach(form => {
+    form.addEventListener('submit', function(e) {
+      const novaSenha = this.querySelector('input[name="novaSenha"]').value;
+      const confirmarSenha = this.querySelector('input[name="confirmarSenha"]').value;
+
+      if (novaSenha.length < 8) {
+        e.preventDefault();
+        alert('A senha deve ter pelo menos 8 caracteres.');
+        return;
+      }
+
+      if (novaSenha !== confirmarSenha) {
+        e.preventDefault();
+        alert('As senhas informadas não coincidem. Por favor, verifique.');
+        return;
+      }
+
+      const submitBtn = this.querySelector('button[type="submit"]');
+      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Salvando...';
+      submitBtn.disabled = true;
+    });
+  });
+});
+</script>

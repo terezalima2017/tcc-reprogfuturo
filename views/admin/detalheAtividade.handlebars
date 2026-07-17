@@ -21,7 +21,7 @@
     <div class="card-body">
       <form action="/admin/atividades/{{atividade.id}}/item" method="POST" enctype="multipart/form-data" class="eco-form">
         {{#if (eq atividade.tipo 'lixo_misterioso')}}
-        <div class="row g-3"><div class="col-md-4"><label class="form-label">Nome do Lixo</label><input type="text" class="form-control" name="nomeLixo" required></div><div class="col-md-4"><label class="form-label">Foto</label><input type="file" class="form-control" name="imagemLixo" accept="image/*"></div><div class="col-md-4"><label class="form-label">Lixeira</label><select class="form-select" name="lixeiraCorreta" required><option value="azul">🔵 Papel</option><option value="vermelho">🔴 Plástico</option><option value="verde">🟢 Vidro</option><option value="amarelo">🟡 Metal</option><option value="marrom">🟤 Orgânico</option></select></div></div>
+        <div class="row g-3"><div class="col-md-4"><label class="form-label">Tipo de Resíduo</label><input type="text" class="form-control" name="nomeLixo" required></div><div class="col-md-4"><label class="form-label">Foto</label><input type="file" class="form-control" name="imagemLixo" accept="image/*" required></div><div class="col-md-4"><label class="form-label">Lixeira</label><select class="form-select" name="lixeiraCorreta" required><option value="azul">🔵 Papel</option><option value="vermelho">🔴 Plástico</option><option value="verde">🟢 Vidro</option><option value="amarelo">🟡 Metal</option><option value="marrom">🟤 Orgânico</option></select></div></div>
         {{/if}}
         {{#if (eq atividade.tipo 'caca_palavras')}}
         <div class="row g-3"><div class="col-md-8"><label class="form-label">Palavra</label><input type="text" class="form-control" name="palavra" required style="text-transform:uppercase;"></div></div>
@@ -58,3 +58,33 @@
     </form>
   </div>
 </div>
+
+{{#if (eq atividade.tipo 'lixo_misterioso')}}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('form[action$="/item"]');
+  if (!form) return;
+  const inputFoto = form.querySelector('input[name="imagemLixo"]');
+  if (!inputFoto) return;
+
+  // Create invalid feedback div
+  const feedback = document.createElement('div');
+  feedback.className = 'invalid-feedback';
+  feedback.textContent = 'A foto do item é obrigatória.';
+  inputFoto.parentNode.appendChild(feedback);
+
+  form.addEventListener('submit', function(e) {
+    if (!inputFoto.files || inputFoto.files.length === 0) {
+      e.preventDefault();
+      inputFoto.classList.add('is-invalid');
+    }
+  });
+
+  inputFoto.addEventListener('change', function() {
+    if (inputFoto.files && inputFoto.files.length > 0) {
+      inputFoto.classList.remove('is-invalid');
+    }
+  });
+});
+</script>
+{{/if}}

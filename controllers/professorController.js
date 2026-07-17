@@ -436,10 +436,11 @@ const professorController = {
       switch (atividade.tipo) {
         case 'lixo_misterioso': {
           const { nomeLixo, lixeiraCorreta } = req.body;
-          let imagemUrl = '';
-          if (req.file) {
-            imagemUrl = '/uploads/atividades/' + req.file.filename;
+          if (!req.file) {
+            req.session.mensagemErro = 'A foto do item é obrigatória.';
+            return res.redirect(`/professor/atividades/${atividadeId}`);
           }
+          const imagemUrl = '/uploads/atividades/' + req.file.filename;
           await LixoMisterioso.create({ atividadeId, nomeLixo, imagemUrl, lixeiraCorreta });
           break;
         }

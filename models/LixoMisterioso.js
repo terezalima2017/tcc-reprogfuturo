@@ -19,14 +19,14 @@ const LixoMisterioso = sequelize.define('LixoMisterioso', {
     type: DataTypes.STRING(100),
     allowNull: false,
     validate: {
-      notEmpty: { msg: 'O nome do lixo é obrigatório.' }
+      notEmpty: { msg: 'O tipo de resíduo é obrigatório.' }
     }
   },
   imagemUrl: {
     type: DataTypes.STRING(500),
     allowNull: false,
     validate: {
-      notEmpty: { msg: 'A imagem do lixo é obrigatória.' }
+      notEmpty: { msg: 'A imagem do resíduo é obrigatória.' }
     }
   },
   lixeiraCorreta: {

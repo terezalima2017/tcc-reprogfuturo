@@ -61,27 +61,36 @@ function renderPergunta() {
 
 function responder(id, valor) {
   respostas[id] = valor;
-  const af = afirmacoes[atual];
-  const correto = (af.resposta === valor) || (String(af.resposta) === String(valor));
 
   const container = document.getElementById('vfContainer');
   const card = container.querySelector('.vf-card');
 
-  if (correto) {
-    card.style.borderLeft = '4px solid #4CAF50';
-    card.insertAdjacentHTML('beforeend', '<p class="mt-2 text-success fw-bold">✅ Correto!</p>');
+  // Set a neutral border indicating answer registered
+  card.style.borderLeft = '4px solid #6c757d';
+
+  // Highlight selected button, dim the other
+  const btnVerdadeiro = card.querySelector('.btn-verdadeiro');
+  const btnFalso = card.querySelector('.btn-falso');
+
+  if (valor === true) {
+    btnVerdadeiro.style.transform = 'scale(1.05)';
+    btnVerdadeiro.style.boxShadow = '0 0 10px rgba(76, 175, 80, 0.5)';
+    btnFalso.style.opacity = '0.4';
   } else {
-    card.style.borderLeft = '4px solid #f44336';
-    card.insertAdjacentHTML('beforeend', '<p class="mt-2 text-danger fw-bold">❌ Incorreto!</p>');
+    btnFalso.style.transform = 'scale(1.05)';
+    btnFalso.style.boxShadow = '0 0 10px rgba(244, 67, 54, 0.5)';
+    btnVerdadeiro.style.opacity = '0.4';
   }
 
-  // Desabilitar botões
+  // Disable buttons
   card.querySelectorAll('button').forEach(b => b.disabled = true);
+
+  card.insertAdjacentHTML('beforeend', '<p class="mt-2 text-muted fw-bold">Resposta registrada!</p>');
 
   setTimeout(() => {
     atual++;
     renderPergunta();
-  }, 1200);
+  }, 800);
 }
 
 document.getElementById('btnFinalizar').addEventListener('click', async function() {

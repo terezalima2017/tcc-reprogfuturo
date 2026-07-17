@@ -1,6 +1,41 @@
-const { Usuario, Atividade, LixoMisterioso, CacaPalavras, VerdadeiroFalso, MultiplaEscolha, DesafioDiario, Turma, AlunoTurma } = require('../models');
+const { Usuario, Atividade, LixoMisterioso, CacaPalavras, VerdadeiroFalso, MultiplaEscolha, DesafioDiario, Turma, AlunoTurma, sequelize } = require('../models');
+const usuarioService = require('../services/usuarioService');
 
 const adminController = {
+  listarUsuarios: async (req, res) => {
+    try {
+      const usuarios = await Usuario.findAll({
+        order: [['createdAt', 'DESC']]
+      });
+      res.render('admin/usuarios', {
+        title: 'Gerenciar Usuários',
+        usuarios: usuarios.map(u => u.toJSON())
+      });
+    } catch (error) {
+      console.error('Erro ao listar usuários:', error);
+      req.session.mensagemErro = 'Erro ao carregar usuários.';
+      res.redirect('/admin/dashboard');
+    }
+  },
+
+  alterarSenhaUsuario: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { novaSenha, confirmarSenha } = req.body;
+
+      const usuario = await usuarioService.alterarSenha(id, novaSenha, confirmarSenha);
+
+      // Log de auditoria
+      console.log(`[AUDITORIA] Administrador ${req.session.usuario.nome} (ID: ${req.session.usuario.id}) alterou a senha do usuário ${usuario.nome} (ID: ${usuario.id}) em ${new Date().toISOString()}`);
+
+      req.session.mensagemSucesso = `Senha do usuário ${usuario.nome} alterada com sucesso!`;
+      res.redirect('/admin/usuarios');
+    } catch (error) {
+      console.error('Erro ao alterar senha:', error);
+      req.session.mensagemErro = error.message || 'Erro ao alterar a senha do usuário.';
+      res.redirect('/admin/usuarios');
+    }
+  },
   dashboard: async (req, res) => {
     try {
       const totalUsuarios = await Usuario.count();
@@ -149,8 +184,11 @@ const adminController = {
       switch (atividade.tipo) {
         case 'lixo_misterioso': {
           const { nomeLixo, lixeiraCorreta } = req.body;
-          let imagemUrl = '';
-          if (req.file) imagemUrl = '/uploads/atividades/' + req.file.filename;
+          if (!req.file) {
+            req.session.mensagemErro = 'A foto do item é obrigatória.';
+            return res.redirect(`/admin/atividades/${atividadeId}`);
+          }
+          const imagemUrl = '/uploads/atividades/' + req.file.filename;
           await LixoMisterioso.create({ atividadeId, nomeLixo, imagemUrl, lixeiraCorreta });
           break;
         }

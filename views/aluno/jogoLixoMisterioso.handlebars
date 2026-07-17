@@ -10,7 +10,7 @@
   <div id="jogoLixo" data-atividade-id="{{atividade.id}}" data-turma-id="{{turmaId}}">
     <div class="eco-card mb-4">
       <div class="card-header text-center">
-        <h5 class="mb-0 fw-bold">Arraste cada lixo para a lixeira correta!</h5>
+        <h5 class="mb-0 fw-bold">Arraste cada resíduo para a lixeira correta!</h5>
       </div>
       <div class="card-body">
         <!-- Lixeiras -->
@@ -37,7 +37,7 @@
           </div>
         </div>
 
-        <!-- Itens de lixo -->
+        <!-- Itens de resíduo -->
         <div id="itensContainer" class="row g-3 justify-content-center"></div>
 
         <div id="resultadoContainer" class="text-center mt-4" style="display:none;">
@@ -85,16 +85,22 @@ document.querySelectorAll('.lixeira').forEach(lixeira => {
     respostas[item.id] = cor;
 
     const el = document.getElementById(`lixoItem-${item.id}`);
-    if (cor === item.lixeiraCorreta) {
-      el.classList.add('correto');
-    } else {
-      el.classList.add('incorreto');
-    }
+    
+    // Deactivate all lixeiras first
+    document.querySelectorAll('.lixeira').forEach(l => l.classList.remove('active'));
+    // Activate the clicked lixeira to show selection
+    this.classList.add('active');
+    
+    // Mark item card as selected neutrally
+    el.classList.add('selecionado');
+    el.insertAdjacentHTML('beforeend', '<p class="mt-2 text-muted fw-bold">Resposta registrada!</p>');
 
     setTimeout(() => {
+      // Remove active class from lixeira
+      this.classList.remove('active');
       itemAtual++;
       renderItem();
-    }, 800);
+    }, 600);
   });
 });
 

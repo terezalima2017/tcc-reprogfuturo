@@ -10,8 +10,12 @@ function isAuthenticated(req, res, next) {
 }
 
 function isAdmin(req, res, next) {
-  if (req.session && req.session.usuario && req.session.usuario.tipo === 'admin') {
-    return next();
+  if (req.session && req.session.usuario) {
+    if (req.session.usuario.tipo === 'admin') {
+      return next();
+    } else {
+      return res.status(403).send('403 Forbidden - Acesso restrito a administradores.');
+    }
   }
   req.session.mensagemErro = 'Acesso restrito a administradores.';
   return res.redirect('/login');
