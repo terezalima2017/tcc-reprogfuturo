@@ -10,7 +10,7 @@
   <div id="jogoLixo" data-atividade-id="{{atividade.id}}" data-turma-id="{{turmaId}}">
     <div class="eco-card mb-4">
       <div class="card-header text-center">
-        <h5 class="mb-0 fw-bold">Arraste cada resíduo para a lixeira correta!</h5>
+        <h5 class="mb-0 fw-bold">Selecione qual o tipo do resíduo apresentado abaixo!</h5>
       </div>
       <div class="card-body">
         <!-- Lixeiras -->
@@ -41,7 +41,8 @@
         <div id="itensContainer" class="row g-3 justify-content-center"></div>
 
         <div id="resultadoContainer" class="text-center mt-4" style="display:none;">
-          <button id="btnFinalizar" class="btn btn-eco btn-lg"><i class="bi bi-check-lg me-2"></i>Finalizar Atividade</button>
+          <button id="btnFinalizar" class="btn btn-eco btn-lg"><i class="bi bi-check-lg me-2"></i>Finalizar
+            Atividade</button>
         </div>
       </div>
     </div>
@@ -51,21 +52,21 @@
 {{> feedbackModal}}
 
 <script>
-const itens = {{{itensJSON}}};
-const atividadeId = '{{atividade.id}}';
-const turmaId = '{{turmaId}}';
-const respostas = {};
-let itemAtual = 0;
-let lixeiraSelecionada = null;
+  const itens = {{{ itensJSON }}};
+  const atividadeId = '{{atividade.id}}';
+  const turmaId = '{{turmaId}}';
+  const respostas = {};
+  let itemAtual = 0;
+  let lixeiraSelecionada = null;
 
-function renderItem() {
-  const container = document.getElementById('itensContainer');
-  if (itemAtual >= itens.length) {
-    document.getElementById('resultadoContainer').style.display = 'block';
-    return;
-  }
-  const item = itens[itemAtual];
-  container.innerHTML = `
+  function renderItem() {
+    const container = document.getElementById('itensContainer');
+    if (itemAtual >= itens.length) {
+      document.getElementById('resultadoContainer').style.display = 'block';
+      return;
+    }
+    const item = itens[itemAtual];
+    container.innerHTML = `
     <div class="col-md-6">
       <div class="lixo-item" id="lixoItem-${item.id}">
         ${item.imagemUrl ? `<img src="${item.imagemUrl}" alt="${item.nomeLixo}" class="mb-2">` : `<div style="font-size:3rem;">🗑️</div>`}
@@ -75,54 +76,54 @@ function renderItem() {
       </div>
     </div>
   `;
-}
-
-document.querySelectorAll('.lixeira').forEach(lixeira => {
-  lixeira.addEventListener('click', function() {
-    if (itemAtual >= itens.length) return;
-    const cor = this.dataset.cor;
-    const item = itens[itemAtual];
-    respostas[item.id] = cor;
-
-    const el = document.getElementById(`lixoItem-${item.id}`);
-    
-    // Deactivate all lixeiras first
-    document.querySelectorAll('.lixeira').forEach(l => l.classList.remove('active'));
-    // Activate the clicked lixeira to show selection
-    this.classList.add('active');
-    
-    // Mark item card as selected neutrally
-    el.classList.add('selecionado');
-    el.insertAdjacentHTML('beforeend', '<p class="mt-2 text-muted fw-bold">Resposta registrada!</p>');
-
-    setTimeout(() => {
-      // Remove active class from lixeira
-      this.classList.remove('active');
-      itemAtual++;
-      renderItem();
-    }, 600);
-  });
-});
-
-document.getElementById('btnFinalizar').addEventListener('click', async function() {
-  this.disabled = true;
-  this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enviando...';
-  try {
-    const resp = await fetch(`/aluno/atividades/${atividadeId}/responder`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ respostas, turmaId })
-    });
-    const data = await resp.json();
-    if (data.sucesso) {
-      mostrarFeedback(data.pontuacao, data.feedback);
-    }
-  } catch (err) {
-    alert('Erro ao enviar respostas.');
-    this.disabled = false;
-    this.innerHTML = '<i class="bi bi-check-lg me-2"></i>Finalizar Atividade';
   }
-});
 
-renderItem();
+  document.querySelectorAll('.lixeira').forEach(lixeira => {
+    lixeira.addEventListener('click', function () {
+      if (itemAtual >= itens.length) return;
+      const cor = this.dataset.cor;
+      const item = itens[itemAtual];
+      respostas[item.id] = cor;
+
+      const el = document.getElementById(`lixoItem-${item.id}`);
+
+      // Deactivate all lixeiras first
+      document.querySelectorAll('.lixeira').forEach(l => l.classList.remove('active'));
+      // Activate the clicked lixeira to show selection
+      this.classList.add('active');
+
+      // Mark item card as selected neutrally
+      el.classList.add('selecionado');
+      el.insertAdjacentHTML('beforeend', '<p class="mt-2 text-muted fw-bold">Resposta registrada!</p>');
+
+      setTimeout(() => {
+        // Remove active class from lixeira
+        this.classList.remove('active');
+        itemAtual++;
+        renderItem();
+      }, 600);
+    });
+  });
+
+  document.getElementById('btnFinalizar').addEventListener('click', async function () {
+    this.disabled = true;
+    this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enviando...';
+    try {
+      const resp = await fetch(`/aluno/atividades/${atividadeId}/responder`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ respostas, turmaId })
+      });
+      const data = await resp.json();
+      if (data.sucesso) {
+        mostrarFeedback(data.pontuacao, data.feedback);
+      }
+    } catch (err) {
+      alert('Erro ao enviar respostas.');
+      this.disabled = false;
+      this.innerHTML = '<i class="bi bi-check-lg me-2"></i>Finalizar Atividade';
+    }
+  });
+
+  renderItem();
 </script>

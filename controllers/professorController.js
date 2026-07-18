@@ -230,8 +230,12 @@ const professorController = {
   // Detalhe da atividade
   detalheAtividade: async (req, res) => {
     try {
+      const professorId = req.session.usuario.id;
       const atividade = await Atividade.findOne({
-        where: { id: req.params.id, criadorId: req.session.usuario.id },
+        where: {
+          id: req.params.id,
+          [Op.or]: [{ criadorId: professorId }, { isTemplate: true }]
+        },
         include: [
           { model: LixoMisterioso, as: 'itensLixo' },
           { model: CacaPalavras, as: 'palavras' },

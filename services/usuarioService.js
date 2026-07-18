@@ -1,4 +1,3 @@
-const bcrypt = require('bcryptjs');
 const usuarioRepository = require('../repositories/usuarioRepository');
 
 const usuarioService = {
@@ -30,10 +29,7 @@ const usuarioService = {
       throw new Error('A senha deve ter pelo menos 8 caracteres.');
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashSenha = await bcrypt.hash(novaSenha, salt);
-
-    await usuarioRepository.atualizarSenha(usuario, hashSenha);
+    await usuarioRepository.atualizarSenha(usuario, novaSenha);
 
     return usuario;
   }

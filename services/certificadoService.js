@@ -19,13 +19,21 @@ const certificadoService = {
 
       if (media < 70) return null;
 
-      // Verificar se já existe certificado
+      // Verificar se já existe certificado — se sim, atualiza a média
       const existente = await Certificado.findOne({ where: { alunoId, turmaId } });
-      if (existente) return existente;
+      const novaMedia = Math.round(media * 10) / 10;
+
+      if (existente) {
+        await existente.update({
+          pontuacaoMedia: novaMedia,
+          geradoEm: new Date()
+        });
+        return existente;
+      }
 
       const certificado = await Certificado.create({
         alunoId, turmaId,
-        pontuacaoMedia: Math.round(media * 10) / 10,
+        pontuacaoMedia: novaMedia,
         arquivoUrl: `/certificados/cert-${alunoId}-${turmaId}.pdf`,
         geradoEm: new Date()
       });

@@ -225,6 +225,18 @@ const alunoController = {
         order: [['geradoEm', 'DESC']]
       });
       if (!certificado) { req.session.mensagemErro = 'Certificado não disponível ainda.'; return res.redirect('/aluno/dashboard'); }
+
+      // Recalcula a média atual com todas as respostas finalizadas da turma
+      const respostasAtuais = await RespostaAtividade.findAll({
+        where: { alunoId, turmaId: certificado.turmaId, finalizada: true }
+      });
+      if (respostasAtuais.length > 0) {
+        const mediaAtual = Math.round((respostasAtuais.reduce((s, r) => s + r.pontuacao, 0) / respostasAtuais.length) * 10) / 10;
+        if (certificado.pontuacaoMedia !== mediaAtual) {
+          await certificado.update({ pontuacaoMedia: mediaAtual, geradoEm: new Date() });
+        }
+      }
+
       res.render('aluno/certificado', { title: 'Meu Certificado', certificado: certificado.toJSON() });
     } catch (error) { console.error('Erro:', error); res.redirect('/aluno/dashboard'); }
   },
@@ -238,6 +250,18 @@ const alunoController = {
         order: [['geradoEm', 'DESC']]
       });
       if (!certificado) { req.session.mensagemErro = 'Certificado não encontrado.'; return res.redirect('/aluno/dashboard'); }
+
+      // Garante que o PDF sempre usa a média mais atual
+      const respostasAtuais = await RespostaAtividade.findAll({
+        where: { alunoId, turmaId: certificado.turmaId, finalizada: true }
+      });
+      if (respostasAtuais.length > 0) {
+        const mediaAtual = Math.round((respostasAtuais.reduce((s, r) => s + r.pontuacao, 0) / respostasAtuais.length) * 10) / 10;
+        if (certificado.pontuacaoMedia !== mediaAtual) {
+          await certificado.update({ pontuacaoMedia: mediaAtual, geradoEm: new Date() });
+        }
+      }
+
       const pdfBuffer = await certificadoService.gerarPDF(certificado);
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `attachment; filename=certificado-${certificado.aluno.nome.replace(/\s+/g, '_')}.pdf`);
