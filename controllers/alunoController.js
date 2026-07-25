@@ -115,7 +115,18 @@ const alunoController = {
         'verdadeiro_falso': 'aluno/jogoVerdadeiroFalso', 'multipla_escolha': 'aluno/jogoMultiplaEscolha',
         'desafio_diario': 'aluno/desafioDiario'
       };
-      const viewData = { title: atividade.nome, atividade: atividadeJson, turmaId: matricula.turmaId };
+      // Envia apenas os campos seguros da atividade (sem includes que contêm respostas corretas)
+      const atividadeSafe = {
+        id: atividade.id,
+        nome: atividade.nome,
+        descricao: atividade.descricao,
+        tipo: atividade.tipo,
+        questoes: atividadeJson.questoes || [],
+        afirmacoes: atividadeJson.afirmacoes || [],
+        palavras: atividadeJson.palavras || [],
+        tarefas: atividadeJson.tarefas || []
+      };
+      const viewData = { title: atividade.nome, atividade: atividadeSafe, turmaId: matricula.turmaId };
       if (atividade.tipo === 'caca_palavras' && atividadeJson.palavras.length > 0) {
         const palavras = atividadeJson.palavras.map(p => p.palavra);
         const tamGrade = cacaPalavrasService.calcularTamanhoGrade(palavras);
@@ -138,7 +149,13 @@ const alunoController = {
         });
         viewData.afirmacoesJSON = JSON.stringify(afirmacoesFiltradas);
       }
-      if (atividade.tipo === 'multipla_escolha') viewData.questoesJSON = JSON.stringify(atividadeJson.questoes);
+      if (atividade.tipo === 'multipla_escolha') {
+        const questoesFiltradas = (atividadeJson.questoes || []).map(q => {
+          const { respostaCorreta, ...rest } = q;
+          return rest;
+        });
+        viewData.questoesJSON = JSON.stringify(questoesFiltradas);
+      }
       res.render(viewMap[atividade.tipo], viewData);
     } catch (error) {
       console.error('Erro:', error); req.session.mensagemErro = 'Erro ao carregar atividade.'; res.redirect('/aluno/atividades');

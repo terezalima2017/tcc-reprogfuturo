@@ -2,9 +2,11 @@ require('dotenv').config();
 const express = require('express');
 const { engine } = require('express-handlebars');
 const session = require('express-session');
+const helmet = require('helmet');
 const path = require('path');
 const { sessionConfig } = require('./config/session');
 const errorHandler = require('./middlewares/errorHandler');
+const sanitizeInput = require('./middlewares/sanitize');
 
 const app = express();
 
@@ -119,9 +121,24 @@ app.engine('handlebars', engine({
 app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, 'views'));
 
+// ===== MIDDLEWARES DE SEGURANÇA =====
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdn.jsdelivr.net"],
+      imgSrc: ["'self'", "data:", "blob:"],
+      connectSrc: ["'self'"]
+    }
+  }
+}));
+
 // ===== MIDDLEWARES =====
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(sanitizeInput);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session(sessionConfig));
 
