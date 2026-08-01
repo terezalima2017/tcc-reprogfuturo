@@ -1,4 +1,4 @@
-const { Usuario } = require('../models');
+
 
 const authController = {
   // Landing page
@@ -23,12 +23,7 @@ const authController = {
     try {
       const { email, senha } = req.body;
 
-      if (!email || !senha) {
-        req.session.mensagemErro = 'Preencha todos os campos.';
-        return res.redirect('/login');
-      }
-
-      const usuario = await Usuario.findOne({ where: { email: email.toLowerCase().trim() } });
+      const usuario = await Usuario.findOne({ where: { email } });
 
       if (!usuario) {
         req.session.mensagemErro = 'Email ou senha incorretos.';
@@ -72,48 +67,21 @@ const authController = {
   // Processar registro
   register: async (req, res) => {
     try {
-      const { nome, email, senha, confirmarSenha, tipo } = req.body;
-
-      // Validações
-      if (!nome || !email || !senha || !confirmarSenha || !tipo) {
-        req.session.mensagemErro = 'Preencha todos os campos.';
-        return res.redirect('/register');
-      }
-
-      if (senha !== confirmarSenha) {
-        req.session.mensagemErro = 'As senhas não coincidem.';
-        return res.redirect('/register');
-      }
-
-      if (senha.length < 6) {
-        req.session.mensagemErro = 'A senha deve ter pelo menos 6 caracteres.';
-        return res.redirect('/register');
-      }
-
-      // Não permitir cadastro de admin
-      if (tipo === 'admin') {
-        req.session.mensagemErro = 'Não é permitido cadastrar administradores.';
-        return res.redirect('/register');
-      }
-
-      if (!['aluno', 'professor'].includes(tipo)) {
-        req.session.mensagemErro = 'Tipo de perfil inválido.';
-        return res.redirect('/register');
-      }
+      const { nome, email, senha } = req.body;
 
       // Verificar email duplicado
-      const emailExiste = await Usuario.findOne({ where: { email: email.toLowerCase().trim() } });
+      const emailExiste = await Usuario.findOne({ where: { email } });
       if (emailExiste) {
         req.session.mensagemErro = 'Este email já está cadastrado.';
         return res.redirect('/register');
       }
 
-      // Criar usuário
+      // Criar usuário — tipo sempre 'aluno' para cadastro público.
       const novoUsuario = await Usuario.create({
-        nome: nome.trim(),
-        email: email.toLowerCase().trim(),
+        nome,
+        email,
         senha,
-        tipo
+        tipo: 'aluno'
       });
 
       // Login automático após registro
@@ -126,7 +94,6 @@ const authController = {
 
       req.session.mensagemSucesso = `Conta criada com sucesso! Bem-vindo(a), ${novoUsuario.nome}! 🌱`;
 
-      if (novoUsuario.tipo === 'professor') return res.redirect('/professor/dashboard');
       return res.redirect('/aluno/dashboard');
 
     } catch (error) {

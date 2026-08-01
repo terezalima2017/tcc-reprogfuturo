@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('./config/initEnv');
 const express = require('express');
 const { engine } = require('express-handlebars');
 const session = require('express-session');
@@ -136,8 +136,8 @@ app.use(helmet({
 }));
 
 // ===== MIDDLEWARES =====
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+app.use(express.json({ limit: '10kb' }));
 app.use(sanitizeInput);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session(sessionConfig));

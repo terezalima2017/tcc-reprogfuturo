@@ -105,8 +105,24 @@ const professorController = {
   // Detalhe da turma
   detalheTurma: async (req, res) => {
     try {
+      const { id } = req.params;
+      const turmaExiste = await Turma.findByPk(id);
+
+      if (!turmaExiste) {
+        req.session.mensagemErro = 'Turma não encontrada.';
+        return res.redirect('/professor/turmas');
+      }
+
+      if (turmaExiste.professorId !== req.session.usuario.id) {
+        return res.status(403).render('error', {
+          title: 'Acesso Negado',
+          statusCode: 403,
+          message: 'Você não tem permissão para acessar esta turma.'
+        });
+      }
+
       const turma = await Turma.findOne({
-        where: { id: req.params.id, professorId: req.session.usuario.id },
+        where: { id, professorId: req.session.usuario.id },
         include: [
           {
             model: AlunoTurma,
@@ -120,11 +136,6 @@ const professorController = {
           }
         ]
       });
-
-      if (!turma) {
-        req.session.mensagemErro = 'Turma não encontrada.';
-        return res.redirect('/professor/turmas');
-      }
 
       res.render('professor/turmaDetalhe', {
         title: `Turma: ${turma.nome}`,
@@ -140,13 +151,26 @@ const professorController = {
   // Excluir turma
   excluirTurma: async (req, res) => {
     try {
-      const turma = await Turma.findOne({
-        where: { id: req.params.id, professorId: req.session.usuario.id }
-      });
-      if (!turma) {
+      const { id } = req.params;
+      const turmaExiste = await Turma.findByPk(id);
+
+      if (!turmaExiste) {
         req.session.mensagemErro = 'Turma não encontrada.';
         return res.redirect('/professor/turmas');
       }
+
+      if (turmaExiste.professorId !== req.session.usuario.id) {
+        return res.status(403).render('error', {
+          title: 'Acesso Negado',
+          statusCode: 403,
+          message: 'Você não tem permissão para excluir esta turma.'
+        });
+      }
+
+      const turma = await Turma.findOne({
+        where: { id, professorId: req.session.usuario.id }
+      });
+
       await AtividadeTurma.destroy({ where: { turmaId: turma.id } });
       await AlunoTurma.destroy({ where: { turmaId: turma.id } });
       await turma.destroy();
@@ -667,8 +691,24 @@ const professorController = {
   // Relatório de uma turma
   relatorioTurma: async (req, res) => {
     try {
+      const { id } = req.params;
+      const turmaExiste = await Turma.findByPk(id);
+
+      if (!turmaExiste) {
+        req.session.mensagemErro = 'Turma não encontrada.';
+        return res.redirect('/professor/relatorios');
+      }
+
+      if (turmaExiste.professorId !== req.session.usuario.id) {
+        return res.status(403).render('error', {
+          title: 'Acesso Negado',
+          statusCode: 403,
+          message: 'Você não tem permissão para visualizar o relatório desta turma.'
+        });
+      }
+
       const turma = await Turma.findOne({
-        where: { id: req.params.id, professorId: req.session.usuario.id },
+        where: { id, professorId: req.session.usuario.id },
         include: [
           {
             model: AlunoTurma,
@@ -682,10 +722,8 @@ const professorController = {
         ]
       });
 
-      if (!turma) {
-        req.session.mensagemErro = 'Turma não encontrada.';
-        return res.redirect('/professor/relatorios');
-      }
+
+
 
       const totalAtividadesTurma = turma.atividadesAssociadas.length;
 
