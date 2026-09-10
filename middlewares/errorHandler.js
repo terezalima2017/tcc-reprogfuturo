@@ -2,8 +2,17 @@ function errorHandler(err, req, res, next) {
   console.error('Erro:', err.message);
   console.error(err.stack);
 
-  const statusCode = err.statusCode || 500;
+  const statusCode = err.status || err.statusCode || 500;
   const message = err.message || 'Ocorreu um erro interno no servidor.';
+
+  // Erro de tamanho excessivo de payload (express.json / urlencoded limit)
+  if (err.type === 'entity.too.large' || statusCode === 413) {
+    return res.status(413).render('error', {
+      title: 'Requisição Muito Grande',
+      statusCode: 413,
+      message: 'O tamanho da requisição excede o limite máximo permitido.'
+    });
+  }
 
   // Erro de upload (multer)
   if (err.code === 'LIMIT_FILE_SIZE') {
