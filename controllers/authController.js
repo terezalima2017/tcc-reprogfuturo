@@ -1,4 +1,5 @@
 
+const { Usuario } = require('../models');
 
 const authController = {
   // Landing page
@@ -67,7 +68,10 @@ const authController = {
   // Processar registro
   register: async (req, res) => {
     try {
-      const { nome, email, senha } = req.body;
+      const { nome, email, senha, tipo } = req.body;
+
+      // Apenas 'aluno' ou 'professor' são permitidos no cadastro público
+      const tipoPermitido = ['aluno', 'professor'].includes(tipo) ? tipo : 'aluno';
 
       // Verificar email duplicado
       const emailExiste = await Usuario.findOne({ where: { email } });
@@ -76,12 +80,12 @@ const authController = {
         return res.redirect('/register');
       }
 
-      // Criar usuário — tipo sempre 'aluno' para cadastro público.
+      // Criar usuário
       const novoUsuario = await Usuario.create({
         nome,
         email,
         senha,
-        tipo: 'aluno'
+        tipo: tipoPermitido
       });
 
       // Login automático após registro
@@ -94,6 +98,7 @@ const authController = {
 
       req.session.mensagemSucesso = `Conta criada com sucesso! Bem-vindo(a), ${novoUsuario.nome}! 🌱`;
 
+      if (novoUsuario.tipo === 'professor') return res.redirect('/professor/dashboard');
       return res.redirect('/aluno/dashboard');
 
     } catch (error) {

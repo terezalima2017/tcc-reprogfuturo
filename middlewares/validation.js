@@ -45,6 +45,11 @@ const validadorRegistro = [
       return true;
     }),
 
+  body('tipo')
+    .trim()
+    .notEmpty().withMessage('O tipo de conta é obrigatório.')
+    .isIn(['aluno', 'professor']).withMessage('Tipo de conta inválido.'),
+
   verificarErros('/register')
 ];
 

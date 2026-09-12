@@ -25,7 +25,13 @@
         <input type="password" class="form-control" id="confirmarSenha" name="confirmarSenha" placeholder="Repita a senha" required>
       </div>
 
-
+      <div class="mb-3">
+        <label for="tipo" class="form-label"><i class="bi bi-people me-1"></i>Tipo de conta</label>
+        <select class="form-control" id="tipo" name="tipo" required>
+          <option value="aluno" selected>Aluno(a)</option>
+          <option value="professor">Professor(a)</option>
+        </select>
+      </div>
 
 
       <button type="submit" class="btn btn-eco w-100 py-2" id="btnRegister">

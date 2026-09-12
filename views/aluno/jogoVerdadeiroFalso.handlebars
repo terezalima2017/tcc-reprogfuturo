@@ -48,15 +48,22 @@ function renderPergunta() {
       <div class="mb-3"><span class="badge bg-eco">${atual + 1}/${afirmacoes.length}</span></div>
       <p class="vf-afirmacao">"${af.afirmacao}"</p>
       <div class="d-flex gap-3 justify-content-center">
-        <button class="btn-verdadeiro" onclick="responder(${af.id}, true)">
+        <button class="btn-verdadeiro" id="btnVerdadeiro">
           <i class="bi bi-check-lg me-1"></i>Verdadeiro
         </button>
-        <button class="btn-falso" onclick="responder(${af.id}, false)">
+        <button class="btn-falso" id="btnFalso">
           <i class="bi bi-x-lg me-1"></i>Falso
         </button>
       </div>
     </div>
   `;
+
+  document.getElementById('btnVerdadeiro').addEventListener('click', function() {
+    responder(af.id, true);
+  });
+  document.getElementById('btnFalso').addEventListener('click', function() {
+    responder(af.id, false);
+  });
 }
 
 function responder(id, valor) {
@@ -69,8 +76,8 @@ function responder(id, valor) {
   card.style.borderLeft = '4px solid #6c757d';
 
   // Highlight selected button, dim the other
-  const btnVerdadeiro = card.querySelector('.btn-verdadeiro');
-  const btnFalso = card.querySelector('.btn-falso');
+  const btnVerdadeiro = document.getElementById('btnVerdadeiro');
+  const btnFalso = document.getElementById('btnFalso');
 
   if (valor === true) {
     btnVerdadeiro.style.transform = 'scale(1.05)';
@@ -83,7 +90,8 @@ function responder(id, valor) {
   }
 
   // Disable buttons
-  card.querySelectorAll('button').forEach(b => b.disabled = true);
+  btnVerdadeiro.disabled = true;
+  btnFalso.disabled = true;
 
   card.insertAdjacentHTML('beforeend', '<p class="mt-2 text-muted fw-bold">Resposta registrada!</p>');
 

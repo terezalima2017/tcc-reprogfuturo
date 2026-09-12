@@ -14,10 +14,10 @@
   <div id="mcContainer"></div>
 
   <div class="d-flex justify-content-center gap-3 mt-4">
-    <button id="btnAnterior" class="btn btn-eco-secondary" onclick="anterior()" style="display:none;">
+    <button id="btnAnterior" class="btn btn-eco-secondary" style="display:none;">
       <i class="bi bi-arrow-left me-1"></i>Anterior
     </button>
-    <button id="btnProxima" class="btn btn-eco" onclick="proxima()">
+    <button id="btnProxima" class="btn btn-eco">
       Próxima <i class="bi bi-arrow-right ms-1"></i>
     </button>
     <button id="btnFinalizar" class="btn btn-eco btn-lg" style="display:none;">
@@ -48,9 +48,9 @@ function renderQuestao() {
 
   alternativas.forEach((alt, i) => {
     const letra = letras[i];
-    const selected = respostas[q.id] === letra ? 'selected' : '';
+    const selected = String(respostas[q.id]) === letra ? 'selected' : '';
     html += `
-      <div class="mc-alternativa ${selected}" onclick="selecionarAlternativa(${q.id}, '${letra}', this)">
+      <div class="mc-alternativa ${selected}" data-qid="${q.id}" data-letra="${letra}">
         <span class="mc-letra">${letra}</span>
         <span>${alt}</span>
       </div>`;
@@ -58,6 +58,14 @@ function renderQuestao() {
 
   html += '</div></div>';
   document.getElementById('mcContainer').innerHTML = html;
+
+  document.querySelectorAll('.mc-alternativa').forEach(el => {
+    el.addEventListener('click', function() {
+      const qId = this.dataset.qid;
+      const letra = this.dataset.letra;
+      selecionarAlternativa(qId, letra, this);
+    });
+  });
 
   document.getElementById('btnAnterior').style.display = atual > 0 ? 'inline-block' : 'none';
   document.getElementById('btnProxima').style.display = atual < questoes.length - 1 ? 'inline-block' : 'none';
@@ -77,6 +85,9 @@ function proxima() {
 function anterior() {
   if (atual > 0) { atual--; renderQuestao(); }
 }
+
+document.getElementById('btnAnterior').addEventListener('click', anterior);
+document.getElementById('btnProxima').addEventListener('click', proxima);
 
 document.getElementById('btnFinalizar').addEventListener('click', async function() {
   const naoRespondidas = questoes.filter(q => !respostas[q.id]).length;
