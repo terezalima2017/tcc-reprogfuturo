@@ -11,8 +11,8 @@ async function iniciar() {
     await sequelize.authenticate();
     console.log('✅ Conexão com o banco de dados estabelecida.');
 
-    // Sincroniza modelos (cria tabelas)
-    await sequelize.sync({ alter: process.env.NODE_ENV === 'development' });
+    // Sincroniza modelos (cria tabelas se não existirem)
+    await sequelize.sync();
     console.log('✅ Tabelas sincronizadas com sucesso.');
 
     // Sincroniza store de sessão

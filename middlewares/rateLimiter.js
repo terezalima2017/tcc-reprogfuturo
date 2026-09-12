@@ -29,10 +29,7 @@ const loginLimiter = rateLimit({
     req.session.mensagemErro =
       'Muitas tentativas de login. Por segurança, aguarde 15 minutos antes de tentar novamente.';
     return res.redirect('/login');
-  },
-
-  // Identifica o cliente pelo IP de origem
-  keyGenerator: (req) => req.ip
+  }
 });
 
 /**
@@ -51,9 +48,7 @@ const registerLimiter = rateLimit({
     req.session.mensagemErro =
       'Muitas tentativas de cadastro. Por segurança, aguarde 1 hora antes de tentar novamente.';
     return res.redirect('/register');
-  },
-
-  keyGenerator: (req) => req.ip
+  }
 });
 
 module.exports = { loginLimiter, registerLimiter };
