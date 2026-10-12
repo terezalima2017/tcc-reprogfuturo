@@ -10,6 +10,11 @@ const sanitizeInput = require('./middlewares/sanitize');
 
 const app = express();
 
+// Confiar no proxy da Vercel para que cookies seguros funcionem corretamente
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 // ===== HANDLEBARS =====
 app.engine('handlebars', engine({
   defaultLayout: 'main',
@@ -130,7 +135,7 @@ app.use(helmet({
       scriptSrcAttr: ["'unsafe-inline'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdn.jsdelivr.net"],
-      imgSrc: ["'self'", "data:", "blob:"],
+      imgSrc: ["'self'", "data:", "blob:", "https://res.cloudinary.com"],
       connectSrc: ["'self'"]
     }
   }

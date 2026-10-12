@@ -1,5 +1,6 @@
 const { Turma, AlunoTurma, Atividade, AtividadeTurma, LixoMisterioso, CacaPalavras, VerdadeiroFalso, MultiplaEscolha, DesafioDiario, RespostaAtividade, EvidenciaDesafio, Usuario } = require('../models');
 const { Op } = require('sequelize');
+const upload = require('../middlewares/upload');
 
 const professorController = {
   // Dashboard
@@ -237,7 +238,7 @@ const professorController = {
       };
 
       if (req.file) {
-        dadosAtividade.imagemUrl = '/uploads/atividades/' + req.file.filename;
+        dadosAtividade.imagemUrl = upload.getFileUrl(req.file);
       }
 
       const atividade = await Atividade.create(dadosAtividade);
@@ -323,7 +324,7 @@ const professorController = {
       atividade.nome = nome.trim();
       atividade.descricao = descricao.trim();
       if (req.file) {
-        atividade.imagemUrl = '/uploads/atividades/' + req.file.filename;
+        atividade.imagemUrl = upload.getFileUrl(req.file);
       }
       await atividade.save();
 
@@ -468,7 +469,7 @@ const professorController = {
             req.session.mensagemErro = 'A foto do item é obrigatória.';
             return res.redirect(`/professor/atividades/${atividadeId}`);
           }
-          const imagemUrl = '/uploads/atividades/' + req.file.filename;
+          const imagemUrl = upload.getFileUrl(req.file);
           await LixoMisterioso.create({ atividadeId, nomeLixo, imagemUrl, lixeiraCorreta });
           break;
         }

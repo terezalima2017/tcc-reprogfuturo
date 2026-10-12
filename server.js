@@ -22,15 +22,22 @@ async function iniciar() {
     // Seed do administrador
     await seedAdmin();
 
-    // Inicia o servidor
-    app.listen(PORT, () => {
-      console.log(`🌿 ReProgFuturo rodando em http://localhost:${PORT}`);
-      console.log(`🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);
-    });
+    // Inicia o servidor (apenas se não for ambiente serverless)
+    if (!process.env.VERCEL) {
+      app.listen(PORT, () => {
+        console.log(`🌿 ReProgFuturo rodando em http://localhost:${PORT}`);
+        console.log(`🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);
+      });
+    }
   } catch (error) {
     console.error('❌ Erro ao iniciar o servidor:', error);
-    process.exit(1);
+    if (!process.env.VERCEL) {
+      process.exit(1);
+    }
   }
 }
 
 iniciar();
+
+// Exporta o app para a Vercel (serverless function)
+module.exports = app;

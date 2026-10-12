@@ -2,6 +2,7 @@ const { Usuario, Turma, AlunoTurma, Atividade, AtividadeTurma, LixoMisterioso, C
 const pontuacaoService = require('../services/pontuacaoService');
 const certificadoService = require('../services/certificadoService');
 const cacaPalavrasService = require('../services/cacaPalavrasService');
+const upload = require('../middlewares/upload');
 const { Op } = require('sequelize');
 
 const alunoController = {
@@ -205,7 +206,7 @@ const alunoController = {
       if (!req.files || req.files.length === 0) { req.session.mensagemErro = 'Envie pelo menos uma foto.'; return res.redirect(`/aluno/atividades/${atividadeId}/jogar`); }
       let resposta = await RespostaAtividade.findOne({ where: { alunoId, atividadeId, turmaId: matricula.turmaId } });
       if (!resposta) { resposta = await RespostaAtividade.create({ alunoId, atividadeId, turmaId: matricula.turmaId, pontuacao: 0, finalizada: false }); }
-      const fotos = req.files.map(f => '/uploads/atividades/' + f.filename);
+      const fotos = req.files.map(f => upload.getFileUrl(f));
       await EvidenciaDesafio.create({ respostaAtividadeId: resposta.id, fotoUrl: fotos[0], fotos, relatorio: relatorio.trim(), status: 'pendente' });
       req.session.mensagemSucesso = 'Evidência enviada! Aguarde avaliação. 📸';
       res.redirect('/aluno/atividades');

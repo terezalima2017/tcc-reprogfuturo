@@ -1,5 +1,6 @@
 const { Usuario, Atividade, LixoMisterioso, CacaPalavras, VerdadeiroFalso, MultiplaEscolha, DesafioDiario, Turma, AlunoTurma, sequelize } = require('../models');
 const usuarioService = require('../services/usuarioService');
+const upload = require('../middlewares/upload');
 
 const adminController = {
   listarUsuarios: async (req, res) => {
@@ -83,7 +84,7 @@ const adminController = {
         nome: nome.trim(), descricao: descricao.trim(), tipo,
         criadorId: req.session.usuario.id, isTemplate: true
       };
-      if (req.file) dados.imagemUrl = '/uploads/atividades/' + req.file.filename;
+      if (req.file) dados.imagemUrl = upload.getFileUrl(req.file);
       const atividade = await Atividade.create(dados);
       req.session.mensagemSucesso = 'Atividade template criada!';
       res.redirect(`/admin/atividades/${atividade.id}`);
@@ -142,7 +143,7 @@ const adminController = {
       const { nome, descricao } = req.body;
       atividade.nome = nome.trim();
       atividade.descricao = descricao.trim();
-      if (req.file) atividade.imagemUrl = '/uploads/atividades/' + req.file.filename;
+      if (req.file) atividade.imagemUrl = upload.getFileUrl(req.file);
       await atividade.save();
       req.session.mensagemSucesso = 'Atividade atualizada!';
       res.redirect(`/admin/atividades/${atividade.id}`);
@@ -188,7 +189,7 @@ const adminController = {
             req.session.mensagemErro = 'A foto do item é obrigatória.';
             return res.redirect(`/admin/atividades/${atividadeId}`);
           }
-          const imagemUrl = '/uploads/atividades/' + req.file.filename;
+          const imagemUrl = upload.getFileUrl(req.file);
           await LixoMisterioso.create({ atividadeId, nomeLixo, imagemUrl, lixeiraCorreta });
           break;
         }
