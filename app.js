@@ -145,6 +145,14 @@ app.use(helmet({
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(express.json({ limit: '10kb' }));
 app.use(sanitizeInput);
+app.get('/css/style.css', (req, res) => {
+  res.type('text/css');
+  res.sendFile(path.join(__dirname, 'public', 'css', 'style.css'));
+});
+app.get('/js/main.js', (req, res) => {
+  res.type('application/javascript');
+  res.sendFile(path.join(__dirname, 'public', 'js', 'main.js'));
+});
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session(sessionConfig));
 
