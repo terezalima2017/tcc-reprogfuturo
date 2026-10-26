@@ -8,12 +8,12 @@ const { validadorRegistro, validadorLogin } = require('../middlewares/validation
 router.get('/', authController.home);
 
 // Login
-router.get('/login', authController.loginForm);
-router.post('/login', loginLimiter, validadorLogin, authController.login);
+router.get(['/login', '/entrar'], authController.loginForm);
+router.post(['/login', '/entrar'], loginLimiter, validadorLogin, authController.login);
 
 // Registro
-router.get('/register', authController.registerForm);
-router.post('/register', registerLimiter, validadorRegistro, authController.register);
+router.get(['/register', '/cadastro'], authController.registerForm);
+router.post(['/register', '/cadastro'], registerLimiter, validadorRegistro, authController.register);
 
 // Logout
 router.get('/logout', authController.logout);
