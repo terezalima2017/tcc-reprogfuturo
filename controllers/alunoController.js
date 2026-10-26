@@ -26,16 +26,19 @@ const alunoController = {
         order: [['updatedAt', 'DESC']], limit: 5
       });
       let certificadoDisponivel = false;
+      let todasAtividadesConcluidas = false;
       if (matricula && totalAtividades > 0 && atividadesRealizadas >= totalAtividades) {
-        const resps = await RespostaAtividade.findAll({ where: { alunoId, turmaId: matricula.turmaId, finalizada: true } });
-        const media = resps.reduce((s, r) => s + r.pontuacao, 0) / resps.length;
-        certificadoDisponivel = media >= 70;
+        todasAtividadesConcluidas = true;
+      }
+      if (matricula) {
+        const cert = await Certificado.findOne({ where: { alunoId, turmaId: matricula.turmaId } });
+        certificadoDisponivel = !!cert;
       }
       res.render('aluno/dashboard', {
         title: 'Dashboard - Aluno', aluno: aluno.toJSON(),
         matricula: matricula ? matricula.toJSON() : null, temTurma: !!matricula,
         atividadesPendentes, atividadesRealizadas, totalAtividades,
-        ultimasRespostas: ultimasRespostas.map(r => r.toJSON()), certificadoDisponivel
+        ultimasRespostas: ultimasRespostas.map(r => r.toJSON()), certificadoDisponivel, todasAtividadesConcluidas
       });
     } catch (error) {
       console.error('Erro no dashboard do aluno:', error);
@@ -227,9 +230,14 @@ const alunoController = {
       });
       const totalPontos = respostas.reduce((s, r) => s + r.pontuacao, 0);
       const media = respostas.length > 0 ? totalPontos / respostas.length : 0;
+      let certificado = null;
+      if (matricula) {
+        certificado = await Certificado.findOne({ where: { alunoId, turmaId: matricula.turmaId } });
+      }
       res.render('aluno/perfil', {
         title: 'Meu Perfil', aluno: aluno.toJSON(), matricula: matricula ? matricula.toJSON() : null,
-        respostas: respostas.map(r => r.toJSON()), totalAtividades: respostas.length, pontuacaoMedia: media.toFixed(1)
+        respostas: respostas.map(r => r.toJSON()), totalAtividades: respostas.length, pontuacaoMedia: media.toFixed(1),
+        certificado: certificado ? certificado.toJSON() : null
       });
     } catch (error) { console.error('Erro:', error); req.session.mensagemErro = 'Erro.'; res.redirect('/aluno/dashboard'); }
   },

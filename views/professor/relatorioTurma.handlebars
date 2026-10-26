@@ -5,9 +5,19 @@
   </div>
 
   <div class="eco-card mb-4">
-    <div class="card-body">
-      <p class="mb-1"><strong>Total de atividades da turma:</strong> {{totalAtividadesTurma}}</p>
-      <p class="mb-0"><strong>Total de alunos:</strong> {{relatorio.length}}</p>
+    <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <div>
+        <p class="mb-1"><strong>Total de atividades da turma:</strong> {{totalAtividadesTurma}}</p>
+        <p class="mb-0"><strong>Total de alunos:</strong> {{relatorio.length}}</p>
+      </div>
+      {{#if relatorio.length}}
+      <form action="/professor/turmas/{{turma.id}}/certificados/liberar-todos" method="POST"
+        onsubmit="return confirm('Deseja liberar o certificado para todos os alunos da turma?')">
+        <button type="submit" class="btn btn-eco">
+          <i class="bi bi-award-fill me-2"></i>Liberar Certificados para Todos
+        </button>
+      </form>
+      {{/if}}
     </div>
   </div>
 
@@ -22,6 +32,7 @@
           <th>Total Atividades</th>
           <th>Pontuação Média</th>
           <th>Participação</th>
+          <th class="text-center">Certificado</th>
         </tr>
       </thead>
       <tbody>
@@ -45,6 +56,25 @@
                 <div class="progress-bar" style="width:{{this.participacao}}%">{{this.participacao}}%</div>
               </div>
             </div>
+          </td>
+          <td class="text-center">
+            {{#if this.certificadoLiberado}}
+              <div class="d-flex flex-column align-items-center gap-1">
+                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Liberado</span>
+                <a href="/professor/turmas/{{../turma.id}}/certificados/{{this.id}}/download" class="btn btn-sm btn-outline-success py-0 px-2 mt-1">
+                  <i class="bi bi-download me-1"></i>PDF
+                </a>
+              </div>
+            {{else}}
+              <form action="/professor/turmas/{{../turma.id}}/certificados/{{this.id}}/liberar" method="POST" class="d-inline">
+                <button type="submit" class="btn btn-sm {{#if this.concluiuTodas}}btn-eco{{else}}btn-outline-secondary{{/if}}">
+                  <i class="bi bi-award me-1"></i>Liberar
+                </button>
+              </form>
+              {{#if this.concluiuTodas}}
+                <small class="d-block text-success mt-1"><i class="bi bi-check2"></i> Concluiu atividades</small>
+              {{/if}}
+            {{/if}}
           </td>
         </tr>
         {{/each}}

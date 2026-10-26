@@ -1,6 +1,7 @@
-const { Turma, AlunoTurma, Atividade, AtividadeTurma, LixoMisterioso, CacaPalavras, VerdadeiroFalso, MultiplaEscolha, DesafioDiario, RespostaAtividade, EvidenciaDesafio, Usuario } = require('../models');
+const { Turma, AlunoTurma, Atividade, AtividadeTurma, LixoMisterioso, CacaPalavras, VerdadeiroFalso, MultiplaEscolha, DesafioDiario, RespostaAtividade, EvidenciaDesafio, Usuario, Certificado } = require('../models');
 const { Op } = require('sequelize');
 const upload = require('../middlewares/upload');
+const certificadoService = require('../services/certificadoService');
 
 const professorController = {
   // Dashboard
@@ -747,14 +748,21 @@ const professorController = {
           ? Math.round((atividadesRealizadas / totalAtividadesTurma) * 100)
           : 0;
 
+        const cert = await Certificado.findOne({
+          where: { alunoId: aluno.id, turmaId: turma.id }
+        });
+
         relatorio.push({
+          id: aluno.id,
           nome: aluno.nome,
           email: aluno.email,
           pontuacaoAcumulada: aluno.pontuacaoAcumulada,
           atividadesRealizadas,
           totalAtividadesTurma,
           pontuacaoMedia: pontuacaoMedia.toFixed(1),
-          participacao
+          participacao,
+          concluiuTodas: totalAtividadesTurma > 0 && atividadesRealizadas >= totalAtividadesTurma,
+          certificadoLiberado: !!cert
         });
       }
 
@@ -768,6 +776,98 @@ const professorController = {
       console.error('Erro no relatório:', error);
       req.session.mensagemErro = 'Erro ao gerar relatório.';
       res.redirect('/professor/relatorios');
+    }
+  },
+
+  // Liberar certificado para um aluno específico
+  liberarCertificado: async (req, res) => {
+    try {
+      const { turmaId, alunoId } = req.params;
+      const turma = await Turma.findOne({
+        where: { id: turmaId, professorId: req.session.usuario.id }
+      });
+      if (!turma) {
+        req.session.mensagemErro = 'Turma não encontrada ou não pertence a você.';
+        return res.redirect('/professor/relatorios');
+      }
+
+      const aluno = await Usuario.findByPk(alunoId);
+      if (!aluno) {
+        req.session.mensagemErro = 'Aluno não encontrado.';
+        return res.redirect(`/professor/relatorios/turma/${turmaId}`);
+      }
+
+      await certificadoService.liberarCertificado(alunoId, turmaId);
+      req.session.mensagemSucesso = `Certificado liberado com sucesso para ${aluno.nome}! 🎓`;
+      res.redirect(`/professor/relatorios/turma/${turmaId}`);
+    } catch (error) {
+      console.error('Erro ao liberar certificado:', error);
+      req.session.mensagemErro = 'Erro ao liberar certificado.';
+      res.redirect(`/professor/relatorios/turma/${req.params.turmaId}`);
+    }
+  },
+
+  // Liberar certificados para todos os alunos da turma
+  liberarCertificadosTurma: async (req, res) => {
+    try {
+      const { turmaId } = req.params;
+      const turma = await Turma.findOne({
+        where: { id: turmaId, professorId: req.session.usuario.id },
+        include: [{ model: AlunoTurma, as: 'matriculas' }]
+      });
+      if (!turma) {
+        req.session.mensagemErro = 'Turma não encontrada.';
+        return res.redirect('/professor/relatorios');
+      }
+
+      let liberados = 0;
+      for (const matricula of turma.matriculas) {
+        await certificadoService.liberarCertificado(matricula.alunoId, turma.id);
+        liberados++;
+      }
+
+      req.session.mensagemSucesso = `Certificados liberados com sucesso para ${liberados} aluno(s) da turma! 🎓`;
+      res.redirect(`/professor/relatorios/turma/${turmaId}`);
+    } catch (error) {
+      console.error('Erro ao liberar certificados:', error);
+      req.session.mensagemErro = 'Erro ao liberar certificados.';
+      res.redirect(`/professor/relatorios/turma/${req.params.turmaId}`);
+    }
+  },
+
+  // Baixar certificado do aluno pelo professor
+  downloadCertificadoAluno: async (req, res) => {
+    try {
+      const { turmaId, alunoId } = req.params;
+      const turma = await Turma.findOne({
+        where: { id: turmaId, professorId: req.session.usuario.id }
+      });
+      if (!turma) {
+        req.session.mensagemErro = 'Acesso negado.';
+        return res.redirect('/professor/relatorios');
+      }
+
+      const certificado = await Certificado.findOne({
+        where: { alunoId, turmaId },
+        include: [
+          { model: Usuario, as: 'aluno' },
+          { model: Turma, as: 'turma', include: [{ model: Usuario, as: 'professor', attributes: ['nome'] }] }
+        ]
+      });
+
+      if (!certificado) {
+        req.session.mensagemErro = 'Certificado ainda não foi liberado para este aluno.';
+        return res.redirect(`/professor/relatorios/turma/${turmaId}`);
+      }
+
+      const pdfBuffer = await certificadoService.gerarPDF(certificado);
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename=certificado-${certificado.aluno.nome.replace(/\s+/g, '_')}.pdf`);
+      res.send(pdfBuffer);
+    } catch (error) {
+      console.error('Erro ao baixar certificado:', error);
+      req.session.mensagemErro = 'Erro ao gerar PDF do certificado.';
+      res.redirect(`/professor/relatorios/turma/${req.params.turmaId}`);
     }
   }
 };

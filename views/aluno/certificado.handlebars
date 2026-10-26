@@ -3,13 +3,12 @@
 
   <div class="certificate-preview">
     <div style="font-size:3rem;">🏆</div>
-    <h2 class="mt-3">Certificado de Bom Desempenho Ambiental</h2>
+    <h2 class="mt-3">Certificado de Conclusão Ambiental</h2>
     <div style="font-size:2rem;" class="my-3">🌿</div>
     <p class="fs-5">Certificamos que</p>
     <p class="cert-name">{{certificado.aluno.nome}}</p>
-    <p class="fs-6 mt-3">concluiu com sucesso todas as atividades ambientais<br>da turma "{{certificado.turma.nome}}"</p>
-    <p>obtendo a pontuação média de <strong>{{toFixed certificado.pontuacaoMedia 1}}</strong> pontos</p>
-    <p class="text-muted">demonstrando excelente conhecimento e compromisso com o meio ambiente.</p>
+    <p class="fs-6 mt-3">concluiu com sucesso as atividades ambientais<br>da turma "{{certificado.turma.nome}}"</p>
+    <p class="text-muted">com aprovação e liberação do(a) professor(a) responsável,<br>demonstrando dedicação, aprendizado e compromisso com o meio ambiente.</p>
     <hr class="mx-auto" style="width:200px;">
     <p class="small text-muted">{{formatDate certificado.geradoEm}}</p>
     {{#if certificado.turma.professor}}

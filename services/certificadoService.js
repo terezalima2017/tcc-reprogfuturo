@@ -4,6 +4,41 @@ const path = require('path');
 const fs = require('fs');
 
 const certificadoService = {
+  async liberarCertificado(alunoId, turmaId) {
+    try {
+      const respostas = await RespostaAtividade.findAll({
+        where: { alunoId, turmaId, finalizada: true }
+      });
+
+      const media = respostas.length > 0
+        ? respostas.reduce((s, r) => s + r.pontuacao, 0) / respostas.length
+        : 100;
+      const pontuacaoMedia = Math.round(media * 10) / 10;
+
+      const existente = await Certificado.findOne({ where: { alunoId, turmaId } });
+      if (existente) {
+        await existente.update({
+          pontuacaoMedia,
+          geradoEm: new Date()
+        });
+        return existente;
+      }
+
+      const certificado = await Certificado.create({
+        alunoId,
+        turmaId,
+        pontuacaoMedia,
+        arquivoUrl: `/certificados/cert-${alunoId}-${turmaId}.pdf`,
+        geradoEm: new Date()
+      });
+
+      return certificado;
+    } catch (error) {
+      console.error('Erro ao liberar certificado:', error);
+      return null;
+    }
+  },
+
   async verificarEGerarCertificado(alunoId, turmaId) {
     try {
       const totalAtividades = await AtividadeTurma.count({ where: { turmaId } });
@@ -13,32 +48,18 @@ const certificadoService = {
         where: { alunoId, turmaId, finalizada: true }
       });
 
-      if (respostas.length < totalAtividades) return null;
-
-      const media = respostas.reduce((s, r) => s + r.pontuacao, 0) / respostas.length;
-
-      if (media < 70) return null;
-
-      // Verificar se já existe certificado — se sim, atualiza a média
+      // Se já foi liberado pelo professor, apenas atualiza a data e pontuação se houver novas atividades
       const existente = await Certificado.findOne({ where: { alunoId, turmaId } });
-      const novaMedia = Math.round(media * 10) / 10;
-
-      if (existente) {
+      if (existente && respostas.length > 0) {
+        const media = respostas.reduce((s, r) => s + r.pontuacao, 0) / respostas.length;
         await existente.update({
-          pontuacaoMedia: novaMedia,
+          pontuacaoMedia: Math.round(media * 10) / 10,
           geradoEm: new Date()
         });
         return existente;
       }
 
-      const certificado = await Certificado.create({
-        alunoId, turmaId,
-        pontuacaoMedia: novaMedia,
-        arquivoUrl: `/certificados/cert-${alunoId}-${turmaId}.pdf`,
-        geradoEm: new Date()
-      });
-
-      return certificado;
+      return null;
     } catch (error) {
       console.error('Erro ao verificar certificado:', error);
       return null;
@@ -70,7 +91,7 @@ const certificadoService = {
 
       // Título
       doc.fontSize(32).fillColor('#1B4332').font('Helvetica-Bold')
-        .text('Certificado de Bom Desempenho Ambiental', 60, 70, { align: 'center' });
+        .text('Certificado de Conclusão Ambiental', 60, 70, { align: 'center' });
 
       // Ícone texto
       doc.fontSize(40).text('🌿', 0, 120, { align: 'center' });
@@ -84,16 +105,16 @@ const certificadoService = {
         .text(nomeAluno, 60, 210, { align: 'center' });
 
       doc.fontSize(16).fillColor('#333').font('Helvetica')
-        .text('concluiu com sucesso todas as atividades ambientais', 60, 260, { align: 'center' });
+        .text('concluiu com sucesso as atividades ambientais', 60, 260, { align: 'center' });
 
       const nomeTurma = certificado.turma ? certificado.turma.nome : 'Turma';
       doc.text(`da turma "${nomeTurma}"`, 60, 285, { align: 'center' });
 
       doc.fontSize(14).text(
-        `obtendo a pontuação média de ${certificado.pontuacaoMedia} pontos,`,
+        'com aprovação e liberação do(a) professor(a) responsável,',
         60, 320, { align: 'center' }
       );
-      doc.text('demonstrando excelente conhecimento e compromisso com o meio ambiente.', 60, 340, { align: 'center' });
+      doc.text('demonstrando dedicação, aprendizado e compromisso com o meio ambiente.', 60, 345, { align: 'center' });
 
       // Data
       const data = new Date(certificado.geradoEm).toLocaleDateString('pt-BR', {

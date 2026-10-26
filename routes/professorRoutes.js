@@ -43,4 +43,9 @@ router.post('/desafios/:id/avaliar', professorController.avaliarDesafio);
 router.get('/relatorios', professorController.relatorios);
 router.get('/relatorios/turma/:id', professorController.relatorioTurma);
 
+// Certificados da Turma
+router.post('/turmas/:turmaId/certificados/:alunoId/liberar', professorController.liberarCertificado);
+router.post('/turmas/:turmaId/certificados/liberar-todos', professorController.liberarCertificadosTurma);
+router.get('/turmas/:turmaId/certificados/:alunoId/download', professorController.downloadCertificadoAluno);
+
 module.exports = router;
