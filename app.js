@@ -41,6 +41,11 @@ app.engine('handlebars', engine({
       const d = new Date(date);
       return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     },
+    formatDateExtenso: (date) => {
+      if (!date) return '';
+      const d = new Date(date);
+      return d.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
+    },
     feedbackEmoji: (pontuacao) => {
       if (pontuacao <= 40) return '😢';
       if (pontuacao <= 60) return '😐';

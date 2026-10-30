@@ -20,6 +20,11 @@ const Turma = sequelize.define('Turma', {
     allowNull: false,
     unique: true
   },
+  escola: {
+    type: DataTypes.STRING(150),
+    allowNull: true,
+    defaultValue: 'Escola Municipal de Ensino Fundamental'
+  },
   professorId: {
     type: DataTypes.INTEGER,
     allowNull: false,
