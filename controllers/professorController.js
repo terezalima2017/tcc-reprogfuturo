@@ -75,9 +75,13 @@ const professorController = {
   // Criar turma
   criarTurma: async (req, res) => {
     try {
-      const { nome } = req.body;
+      const { nome, escola } = req.body;
       if (!nome || nome.trim().length < 2) {
         req.session.mensagemErro = 'O nome da turma é obrigatório (mínimo 2 caracteres).';
+        return res.redirect('/professor/turmas/criar');
+      }
+      if (!escola || escola.trim().length < 3) {
+        req.session.mensagemErro = 'O nome da escola é obrigatório (mínimo 3 caracteres).';
         return res.redirect('/professor/turmas/criar');
       }
 
@@ -91,6 +95,7 @@ const professorController = {
 
       await Turma.create({
         nome: nome.trim(),
+        escola: escola.trim(),
         codigo,
         professorId: req.session.usuario.id
       });
@@ -101,6 +106,30 @@ const professorController = {
       console.error('Erro ao criar turma:', error);
       req.session.mensagemErro = 'Erro ao criar turma.';
       res.redirect('/professor/turmas/criar');
+    }
+  },
+
+  // Salvar nome da escola da turma
+  salvarEscola: async (req, res) => {
+    try {
+      const { turmaId } = req.params;
+      const { escola } = req.body;
+      if (!escola || escola.trim().length < 3) {
+        req.session.mensagemErro = 'O nome da escola é obrigatório (mínimo 3 caracteres).';
+        return res.redirect(`/professor/relatorios/turma/${turmaId}`);
+      }
+      const turma = await Turma.findOne({ where: { id: turmaId, professorId: req.session.usuario.id } });
+      if (!turma) {
+        req.session.mensagemErro = 'Turma não encontrada.';
+        return res.redirect('/professor/relatorios');
+      }
+      await turma.update({ escola: escola.trim() });
+      req.session.mensagemSucesso = 'Nome da escola salvo com sucesso! Agora você pode liberar os certificados.';
+      res.redirect(`/professor/relatorios/turma/${turmaId}`);
+    } catch (error) {
+      console.error('Erro ao salvar escola:', error);
+      req.session.mensagemErro = 'Erro ao salvar nome da escola.';
+      res.redirect(`/professor/relatorios/turma/${req.params.turmaId}`);
     }
   },
 
@@ -791,6 +820,12 @@ const professorController = {
         return res.redirect('/professor/relatorios');
       }
 
+      // Validação obrigatória: escola deve estar preenchida
+      if (!turma.escola || turma.escola.trim().length < 3) {
+        req.session.mensagemErro = '⚠️ Informe o nome da escola antes de liberar o certificado. Preencha o campo obrigatório na seção de dados da turma.';
+        return res.redirect(`/professor/relatorios/turma/${turmaId}`);
+      }
+
       const aluno = await Usuario.findByPk(alunoId);
       if (!aluno) {
         req.session.mensagemErro = 'Aluno não encontrado.';
@@ -818,6 +853,12 @@ const professorController = {
       if (!turma) {
         req.session.mensagemErro = 'Turma não encontrada.';
         return res.redirect('/professor/relatorios');
+      }
+
+      // Validação obrigatória: escola deve estar preenchida
+      if (!turma.escola || turma.escola.trim().length < 3) {
+        req.session.mensagemErro = '⚠️ Informe o nome da escola antes de liberar os certificados. Preencha o campo obrigatório na seção de dados da turma.';
+        return res.redirect(`/professor/relatorios/turma/${turmaId}`);
       }
 
       let liberados = 0;
@@ -851,7 +892,7 @@ const professorController = {
         where: { alunoId, turmaId },
         include: [
           { model: Usuario, as: 'aluno' },
-          { model: Turma, as: 'turma', include: [{ model: Usuario, as: 'professor', attributes: ['nome'] }] }
+          { model: Turma, as: 'turma', attributes: ['id', 'nome', 'escola'], include: [{ model: Usuario, as: 'professor', attributes: ['nome'] }] }
         ]
       });
 

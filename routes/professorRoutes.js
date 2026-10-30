@@ -48,4 +48,7 @@ router.post('/turmas/:turmaId/certificados/:alunoId/liberar', professorControlle
 router.post('/turmas/:turmaId/certificados/liberar-todos', professorController.liberarCertificadosTurma);
 router.get('/turmas/:turmaId/certificados/:alunoId/download', professorController.downloadCertificadoAluno);
 
+// Escola da Turma
+router.post('/turmas/:turmaId/escola', professorController.salvarEscola);
+
 module.exports = router;

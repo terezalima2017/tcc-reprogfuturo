@@ -4,6 +4,58 @@
     <a href="/professor/relatorios" class="btn btn-eco-secondary"><i class="bi bi-arrow-left me-2"></i>Voltar</a>
   </div>
 
+  <!-- Painel de Dados da Escola (obrigatório para liberar certificados) -->
+  <div class="eco-card mb-4 {{#unless turma.escola}}border border-2 border-warning{{/unless}}">
+    <div class="card-header d-flex align-items-center gap-2">
+      <i class="bi bi-building me-1"></i>Dados da Escola para Certificados
+      {{#if turma.escola}}
+        <span class="badge bg-success ms-auto"><i class="bi bi-check-circle me-1"></i>Escola confirmada</span>
+      {{else}}
+        <span class="badge bg-warning text-dark ms-auto"><i class="bi bi-exclamation-triangle me-1"></i>Pendente — obrigatório</span>
+      {{/if}}
+    </div>
+    <div class="card-body">
+      {{#if turma.escola}}
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+          <div>
+            <span class="text-muted small">Nome da escola registrada:</span>
+            <p class="fw-bold fs-6 mb-0 mt-1"><i class="bi bi-building me-2 text-success"></i>{{turma.escola}}</p>
+          </div>
+          <button class="btn btn-eco-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#formEditarEscola">
+            <i class="bi bi-pencil me-1"></i>Alterar
+          </button>
+        </div>
+        <div class="collapse mt-3" id="formEditarEscola">
+          <form action="/professor/turmas/{{turma.id}}/escola" method="POST" class="eco-form">
+            <div class="input-group">
+              <input type="text" class="form-control" name="escola" placeholder="Nome completo da escola" value="{{turma.escola}}" required minlength="3">
+              <button type="submit" class="btn btn-eco"><i class="bi bi-check-lg me-1"></i>Salvar</button>
+            </div>
+          </form>
+        </div>
+      {{else}}
+        <div class="alert alert-warning mb-3 d-flex gap-2 align-items-start">
+          <i class="bi bi-exclamation-triangle-fill fs-5 mt-1"></i>
+          <div>
+            <strong>Ação necessária:</strong> O nome da escola é <strong>obrigatório</strong> para a emissão dos certificados. Preencha abaixo antes de liberar qualquer certificado.
+          </div>
+        </div>
+        <form action="/professor/turmas/{{turma.id}}/escola" method="POST" class="eco-form">
+          <div class="mb-3">
+            <label for="escola" class="form-label fw-semibold">Nome completo da escola <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-building"></i></span>
+              <input type="text" class="form-control form-control-lg" id="escola" name="escola"
+                placeholder="Ex: E.M.E.F. Professora Maria da Silva" required minlength="3">
+              <button type="submit" class="btn btn-eco"><i class="bi bi-check-lg me-1"></i>Confirmar</button>
+            </div>
+            <div class="form-text">Este nome aparecerá em todos os certificados desta turma.</div>
+          </div>
+        </form>
+      {{/if}}
+    </div>
+  </div>
+
   <div class="eco-card mb-4">
     <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
       <div>
@@ -11,12 +63,18 @@
         <p class="mb-0"><strong>Total de alunos:</strong> {{relatorio.length}}</p>
       </div>
       {{#if relatorio.length}}
+      {{#if turma.escola}}
       <form action="/professor/turmas/{{turma.id}}/certificados/liberar-todos" method="POST"
         onsubmit="return confirm('Deseja liberar o certificado para todos os alunos da turma?')">
         <button type="submit" class="btn btn-eco">
           <i class="bi bi-award-fill me-2"></i>Liberar Certificados para Todos
         </button>
       </form>
+      {{else}}
+      <button class="btn btn-outline-warning" disabled title="Informe o nome da escola primeiro">
+        <i class="bi bi-lock me-2"></i>Liberar para Todos (bloqueado)
+      </button>
+      {{/if}}
       {{/if}}
     </div>
   </div>
@@ -66,6 +124,7 @@
                 </a>
               </div>
             {{else}}
+              {{#if ../turma.escola}}
               <form action="/professor/turmas/{{../turma.id}}/certificados/{{this.id}}/liberar" method="POST" class="d-inline">
                 <button type="submit" class="btn btn-sm {{#if this.concluiuTodas}}btn-eco{{else}}btn-outline-secondary{{/if}}">
                   <i class="bi bi-award me-1"></i>Liberar
@@ -73,6 +132,11 @@
               </form>
               {{#if this.concluiuTodas}}
                 <small class="d-block text-success mt-1"><i class="bi bi-check2"></i> Concluiu atividades</small>
+              {{/if}}
+              {{else}}
+              <span class="badge bg-secondary" title="Informe o nome da escola primeiro">
+                <i class="bi bi-lock me-1"></i>Bloqueado
+              </span>
               {{/if}}
             {{/if}}
           </td>

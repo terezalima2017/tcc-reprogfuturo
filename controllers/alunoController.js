@@ -247,7 +247,10 @@ const alunoController = {
       const alunoId = req.session.usuario.id;
       const certificado = await Certificado.findOne({
         where: { alunoId },
-        include: [{ model: Usuario, as: 'aluno' }, { model: Turma, as: 'turma', include: [{ model: Usuario, as: 'professor', attributes: ['nome'] }] }],
+        include: [
+          { model: Usuario, as: 'aluno' },
+          { model: Turma, as: 'turma', attributes: ['id', 'nome', 'escola'], include: [{ model: Usuario, as: 'professor', attributes: ['nome'] }] }
+        ],
         order: [['geradoEm', 'DESC']]
       });
       if (!certificado) { req.session.mensagemErro = 'Certificado não disponível ainda.'; return res.redirect('/aluno/dashboard'); }
@@ -272,7 +275,10 @@ const alunoController = {
       const alunoId = req.session.usuario.id;
       const certificado = await Certificado.findOne({
         where: { alunoId },
-        include: [{ model: Usuario, as: 'aluno' }, { model: Turma, as: 'turma', include: [{ model: Usuario, as: 'professor', attributes: ['nome'] }] }],
+        include: [
+          { model: Usuario, as: 'aluno' },
+          { model: Turma, as: 'turma', attributes: ['id', 'nome', 'escola'], include: [{ model: Usuario, as: 'professor', attributes: ['nome'] }] }
+        ],
         order: [['geradoEm', 'DESC']]
       });
       if (!certificado) { req.session.mensagemErro = 'Certificado não encontrado.'; return res.redirect('/aluno/dashboard'); }

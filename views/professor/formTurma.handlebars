@@ -9,6 +9,11 @@
           <label for="nome" class="form-label"><i class="bi bi-pencil me-1"></i>Nome da Turma</label>
           <input type="text" class="form-control" id="nome" name="nome" placeholder="Ex: 5° Ano A - Meio Ambiente" required minlength="2">
         </div>
+        <div class="mb-4">
+          <label for="escola" class="form-label"><i class="bi bi-building me-1"></i>Nome da Escola <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="escola" name="escola" placeholder="Ex: E.M.E.F. Professora Maria da Silva" required minlength="3">
+          <div class="form-text">O nome da escola aparecerá nos certificados dos alunos.</div>
+        </div>
         <button type="submit" class="btn btn-eco w-100 py-2"><i class="bi bi-plus-lg me-2"></i>Criar Turma</button>
       </form>
       <a href="/professor/turmas" class="btn btn-eco-secondary w-100 mt-3"><i class="bi bi-arrow-left me-2"></i>Voltar</a>

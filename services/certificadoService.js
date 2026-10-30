@@ -1,7 +1,5 @@
 const PDFDocument = require('pdfkit');
 const { AtividadeTurma, RespostaAtividade, Certificado, Usuario, Turma } = require('../models');
-const path = require('path');
-const fs = require('fs');
 
 const certificadoService = {
   async liberarCertificado(alunoId, turmaId) {
@@ -68,10 +66,11 @@ const certificadoService = {
 
   async gerarPDF(certificado) {
     return new Promise((resolve, reject) => {
+      // A4 horizontal: 841.89 x 595.28 pontos
       const doc = new PDFDocument({
         size: 'A4',
         layout: 'landscape',
-        margins: { top: 50, bottom: 50, left: 60, right: 60 }
+        margins: { top: 0, bottom: 0, left: 0, right: 0 }
       });
 
       const buffers = [];
@@ -79,59 +78,165 @@ const certificadoService = {
       doc.on('end', () => resolve(Buffer.concat(buffers)));
       doc.on('error', reject);
 
-      const w = doc.page.width;
-      const h = doc.page.height;
+      const w = doc.page.width;   // 841.89
+      const h = doc.page.height;  // 595.28
 
-      // Fundo
-      doc.rect(0, 0, w, h).fill('#f0faf0');
+      // ===== FUNDO =====
+      doc.rect(0, 0, w, h).fill('#FAFDF6');
 
-      // Bordas decorativas
-      doc.rect(20, 20, w - 40, h - 40).lineWidth(3).stroke('#2D6A4F');
-      doc.rect(30, 30, w - 60, h - 60).lineWidth(1).stroke('#52B788');
+      // ===== BORDA EXTERNA (3pt) =====
+      const margBordaExt = 18;
+      doc.rect(margBordaExt, margBordaExt, w - margBordaExt * 2, h - margBordaExt * 2)
+        .lineWidth(2.5)
+        .stroke('#2D6A4F');
 
-      // Título
-      doc.fontSize(32).fillColor('#1B4332').font('Helvetica-Bold')
-        .text('Certificado de Conclusão Ambiental', 60, 70, { align: 'center' });
+      // ===== BORDA INTERNA (1pt) =====
+      const margBordaInt = 28;
+      doc.rect(margBordaInt, margBordaInt, w - margBordaInt * 2, h - margBordaInt * 2)
+        .lineWidth(0.8)
+        .stroke('#52B788');
 
-      // Ícone texto
-      doc.fontSize(40).text('🌿', 0, 120, { align: 'center' });
+      // ===== FOLHA SVG simplificada como formas geométricas =====
+      const leafX = 55, leafY = 52;
+      // Corpo da folha
+      doc.save();
+      doc.translate(leafX, leafY);
+      doc.ellipse(0, 0, 14, 22).fillOpacity(0.12).fill('#2D6A4F');
+      doc.fillOpacity(1);
+      // Nervura central
+      doc.moveTo(0, -22).lineTo(0, 22).lineWidth(1).stroke('#52B788');
+      // Nervuras laterais
+      doc.moveTo(0, -8).lineTo(-10, -2).lineWidth(0.7).stroke('#52B788');
+      doc.moveTo(0, -8).lineTo(10, -2).lineWidth(0.7).stroke('#40916C');
+      doc.moveTo(0, 2).lineTo(-10, 8).lineWidth(0.7).stroke('#52B788');
+      doc.moveTo(0, 2).lineTo(10, 8).lineWidth(0.7).stroke('#40916C');
+      doc.restore();
 
-      // Corpo
-      doc.fontSize(16).fillColor('#333').font('Helvetica')
-        .text('Certificamos que', 60, 180, { align: 'center' });
+      // ===== CABEÇALHO: MARCA =====
+      const headerY = 48;
+      doc.fontSize(11).fillColor('#1B4332').font('Helvetica-Bold')
+        .text('REPROGFUTURO', 80, headerY, { align: 'left', width: 200, characterSpacing: 1.5 });
+      doc.fontSize(7).fillColor('#40916C').font('Helvetica')
+        .text('PLATAFORMA DE EDUCAÇÃO AMBIENTAL', 80, headerY + 14, { align: 'left', width: 200, characterSpacing: 0.8 });
 
+      // ===== CABEÇALHO: ESCOLA (à direita) =====
+      const nomeEscola = (certificado.turma && certificado.turma.escola)
+        ? certificado.turma.escola.toUpperCase()
+        : '';
+      if (nomeEscola) {
+        // Linha vertical decorativa
+        doc.moveTo(w - margBordaInt - 220, headerY - 2)
+          .lineTo(w - margBordaInt - 220, headerY + 28)
+          .lineWidth(1.5).stroke('#52B788');
+
+        doc.fontSize(7).fillColor('#2D6A4F').font('Helvetica-Bold')
+          .text(nomeEscola, w - margBordaInt - 210, headerY, {
+            align: 'right',
+            width: 195,
+            characterSpacing: 0.5,
+            lineGap: 2
+          });
+      }
+
+      // ===== LINHA ORNAMENTAL SUPERIOR =====
+      const ornY = 90;
+      doc.moveTo(margBordaInt + 10, ornY).lineTo(w - margBordaInt - 10, ornY)
+        .lineWidth(0.6).stroke('#2D6A4F');
+      doc.fontSize(10).fillColor('#2D6A4F').font('Helvetica')
+        .text('❧', w / 2 - 8, ornY - 7);
+
+      // ===== TÍTULO PRINCIPAL =====
+      doc.fontSize(26).fillColor('#1B4332').font('Helvetica-Bold')
+        .text('Certificado de Aprendizado Ambiental', 40, 108, {
+          align: 'center',
+          width: w - 80,
+          characterSpacing: 0.5
+        });
+
+      // ===== CORPO =====
+      const corpoY = 150;
+      doc.fontSize(9).fillColor('#666').font('Helvetica')
+        .text('C E R T I F I C A M O S  Q U E', 40, corpoY, {
+          align: 'center',
+          width: w - 80,
+          characterSpacing: 2
+        });
+
+      // Nome do aluno
       const nomeAluno = certificado.aluno ? certificado.aluno.nome : 'Aluno';
-      doc.fontSize(28).fillColor('#2D6A4F').font('Helvetica-Bold')
-        .text(nomeAluno, 60, 210, { align: 'center' });
+      doc.fontSize(30).fillColor('#2D6A4F').font('Helvetica-Bold')
+        .text(nomeAluno, 40, corpoY + 18, {
+          align: 'center',
+          width: w - 80,
+          characterSpacing: 0.3
+        });
 
-      doc.fontSize(16).fillColor('#333').font('Helvetica')
-        .text('concluiu com sucesso as atividades ambientais', 60, 260, { align: 'center' });
+      // Sublinhado gradiente simulado com linha
+      const nomeWidth = Math.min(doc.widthOfString(nomeAluno, { fontSize: 30 }) + 60, w - 200);
+      const nomeLineX = (w - nomeWidth) / 2;
+      doc.moveTo(nomeLineX, corpoY + 52)
+        .lineTo(nomeLineX + nomeWidth, corpoY + 52)
+        .lineWidth(1.5).stroke('#0077B6');
 
+      // Parágrafo descritivo
       const nomeTurma = certificado.turma ? certificado.turma.nome : 'Turma';
-      doc.text(`da turma "${nomeTurma}"`, 60, 285, { align: 'center' });
+      const escolaTexto = (certificado.turma && certificado.turma.escola) ? certificado.turma.escola : 'instituição de ensino';
 
-      doc.fontSize(14).text(
-        'com aprovação e liberação do(a) professor(a) responsável,',
-        60, 320, { align: 'center' }
-      );
-      doc.text('demonstrando dedicação, aprendizado e compromisso com o meio ambiente.', 60, 345, { align: 'center' });
+      doc.fontSize(10).fillColor('#333').font('Helvetica')
+        .text(
+          `estudante da ${escolaTexto}, turma "${nomeTurma}", concluiu as atividades educativas da plataforma ReProgFuturo,\ndemonstrando aprendizado sobre educação ambiental, sustentabilidade, preservação do meio ambiente e cidadania.`,
+          80, corpoY + 62,
+          { align: 'center', width: w - 160, lineGap: 3 }
+        );
 
-      // Data
+      // ===== LINHA ORNAMENTAL INFERIOR =====
+      const ornY2 = corpoY + 110;
+      doc.moveTo(margBordaInt + 10, ornY2).lineTo(w - margBordaInt - 10, ornY2)
+        .lineWidth(0.6).stroke('#2D6A4F');
+      doc.fontSize(10).fillColor('#2D6A4F').font('Helvetica')
+        .text('❧', w / 2 - 8, ornY2 - 7);
+
+      // ===== RODAPÉ =====
+      const rodapeY = ornY2 + 14;
+
+      // Data (esquerda)
       const data = new Date(certificado.geradoEm).toLocaleDateString('pt-BR', {
         day: 'numeric', month: 'long', year: 'numeric'
       });
-      doc.fontSize(12).fillColor('#666').text(data, 60, 400, { align: 'center' });
+      doc.fontSize(7).fillColor('#888').font('Helvetica')
+        .text('DATA DE EMISSÃO', margBordaInt + 14, rodapeY, { characterSpacing: 0.8 });
+      doc.fontSize(9).fillColor('#1B4332').font('Helvetica-Bold')
+        .text(data, margBordaInt + 14, rodapeY + 10);
 
-      // Linha de assinatura
-      doc.moveTo(w / 2 - 120, 450).lineTo(w / 2 + 120, 450).lineWidth(1).stroke('#999');
+      // Selo central (círculos)
+      const seloX = w / 2;
+      const seloY = rodapeY + 22;
+      doc.circle(seloX, seloY, 30).lineWidth(1.2).stroke('#2D6A4F');
+      doc.circle(seloX, seloY, 24).lineWidth(0.5).dash(3, { space: 2.5 }).stroke('#52B788');
+      doc.undash();
+      doc.fontSize(5.5).fillColor('#2D6A4F').font('Helvetica-Bold')
+        .text('REPROG', seloX - 18, seloY - 9)
+        .text('FUTURO', seloX - 13, seloY - 2)
+        .text('✦ 2026 ✦', seloX - 14, seloY + 5);
+
+      // Assinatura do professor (direita)
       const nomeProfessor = (certificado.turma && certificado.turma.professor)
         ? certificado.turma.professor.nome : 'Professor(a)';
-      doc.fontSize(12).fillColor('#333').text(nomeProfessor, 60, 458, { align: 'center' });
-      doc.fontSize(10).fillColor('#666').text('Professor(a) Responsável', 60, 475, { align: 'center' });
+      const assinaturaX = w - margBordaInt - 200;
+      doc.moveTo(assinaturaX, rodapeY + 22)
+        .lineTo(assinaturaX + 160, rodapeY + 22)
+        .lineWidth(0.8).stroke('#2D6A4F');
+      doc.fontSize(9).fillColor('#1B4332').font('Helvetica-Bold')
+        .text(nomeProfessor, assinaturaX, rodapeY + 25, { width: 160, align: 'center' });
+      doc.fontSize(7).fillColor('#888').font('Helvetica')
+        .text('PROFESSOR(A) RESPONSÁVEL', assinaturaX, rodapeY + 36, {
+          width: 160, align: 'center', characterSpacing: 0.6
+        });
 
-      // Rodapé
-      doc.fontSize(9).fillColor('#999')
-        .text('ReProgFuturo - Plataforma de Educação Ambiental', 60, h - 60, { align: 'center' });
+      // ===== RODAPÉ FINAL =====
+      doc.fontSize(7).fillColor('#AAA').font('Helvetica')
+        .text('ReProgFuturo — Plataforma de Educação Ambiental | Documento emitido eletronicamente',
+          40, h - 32, { align: 'center', width: w - 80 });
 
       doc.end();
     });

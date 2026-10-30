@@ -1,27 +1,120 @@
 <div class="container py-4 fade-in-up">
-  <h2 class="fw-bold text-center mb-4"><i class="bi bi-award me-2"></i>Meu Certificado</h2>
 
-  <div class="certificate-preview">
-    <div style="font-size:3rem;">🏆</div>
-    <h2 class="mt-3">Certificado de Conclusão Ambiental</h2>
-    <div style="font-size:2rem;" class="my-3">🌿</div>
-    <p class="fs-5">Certificamos que</p>
-    <p class="cert-name">{{certificado.aluno.nome}}</p>
-    <p class="fs-6 mt-3">concluiu com sucesso as atividades ambientais<br>da turma "{{certificado.turma.nome}}"</p>
-    <p class="text-muted">com aprovação e liberação do(a) professor(a) responsável,<br>demonstrando dedicação, aprendizado e compromisso com o meio ambiente.</p>
-    <hr class="mx-auto" style="width:200px;">
-    <p class="small text-muted">{{formatDate certificado.geradoEm}}</p>
-    {{#if certificado.turma.professor}}
-    <p class="small"><strong>{{certificado.turma.professor.nome}}</strong><br>Professor(a) Responsável</p>
-    {{/if}}
+  <div class="cert-page-header text-center mb-4">
+    <h2 class="fw-bold" style="color: var(--eco-primary);"><i class="bi bi-award me-2"></i>Meu Certificado</h2>
+    <p class="text-muted mb-0">Clique em "Baixar PDF" para salvar ou imprimir seu certificado</p>
   </div>
 
-  <div class="text-center mt-4">
-    <a href="/aluno/certificado/download" class="btn btn-eco btn-lg">
-      <i class="bi bi-download me-2"></i>Baixar PDF
+  <!-- CERTIFICADO -->
+  <div class="cert-wrap">
+    <div class="cert-doc" id="certificadoPreview">
+
+      <!-- Borda externa ornamental -->
+      <div class="cert-border-outer">
+        <div class="cert-border-inner">
+
+          <!-- Cabeçalho institucional -->
+          <div class="cert-header">
+            <div class="cert-logo-leaf" aria-hidden="true">
+              <svg viewBox="0 0 64 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M32 4C32 4 10 18 10 42C10 58 20 70 32 76C44 70 54 58 54 42C54 18 32 4 32 4Z" fill="#2D6A4F" opacity="0.18"/>
+                <path d="M32 10C32 10 14 22 14 43C14 57 22 68 32 74" stroke="#2D6A4F" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M32 10C32 10 50 22 50 43C50 57 42 68 32 74" stroke="#40916C" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="32" y1="74" x2="32" y2="20" stroke="#52B788" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="3 4"/>
+                <path d="M32 35 Q22 28 18 20" stroke="#52B788" stroke-width="1.2" stroke-linecap="round"/>
+                <path d="M32 45 Q20 40 16 32" stroke="#52B788" stroke-width="1.2" stroke-linecap="round"/>
+                <path d="M32 35 Q42 28 46 20" stroke="#40916C" stroke-width="1.2" stroke-linecap="round"/>
+                <path d="M32 48 Q44 42 48 33" stroke="#40916C" stroke-width="1.2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="cert-brand">
+              <span class="cert-brand-name">ReProgFuturo</span>
+              <span class="cert-brand-sub">Plataforma de Educação Ambiental</span>
+            </div>
+            <div class="cert-escola-box">
+              {{#if certificado.turma.escola}}
+              <span class="cert-escola-text">{{certificado.turma.escola}}</span>
+              {{/if}}
+            </div>
+          </div>
+
+          <!-- Linha ornamental -->
+          <div class="cert-ornament-line">
+            <span class="cert-orn-leaf">❧</span>
+          </div>
+
+          <!-- Título principal -->
+          <div class="cert-title-area">
+            <h1 class="cert-title-main">Certificado de Aprendizado Ambiental</h1>
+          </div>
+
+          <!-- Corpo do certificado -->
+          <div class="cert-body">
+            <p class="cert-intro-text">Certificamos que</p>
+
+            <div class="cert-aluno-name-block">
+              <p class="cert-aluno-nome">{{certificado.aluno.nome}}</p>
+              <div class="cert-nome-underline"></div>
+            </div>
+
+            <div class="cert-descricao">
+              <p>
+                estudante da <strong>{{#if certificado.turma.escola}}{{certificado.turma.escola}}{{else}}instituição de ensino{{/if}}</strong>,
+                turma <strong>{{certificado.turma.nome}}</strong>, concluiu as atividades educativas da
+                plataforma <strong>ReProgFuturo</strong>, demonstrando aprendizado sobre
+                <em>educação ambiental</em>, <em>sustentabilidade</em>,
+                <em>preservação do meio ambiente</em> e <em>cidadania</em>.
+              </p>
+            </div>
+          </div>
+
+          <!-- Linha ornamental inferior -->
+          <div class="cert-ornament-line">
+            <span class="cert-orn-leaf">❧</span>
+          </div>
+
+          <!-- Rodapé com assinatura e data -->
+          <div class="cert-footer">
+            <div class="cert-footer-left">
+              <div class="cert-data-field">
+                <span class="cert-field-label">Data de Emissão</span>
+                <span class="cert-field-value">{{formatDateExtenso certificado.geradoEm}}</span>
+              </div>
+            </div>
+            <div class="cert-footer-center cert-sigilo">
+              <div class="cert-selo">
+                <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" width="70" height="70">
+                  <circle cx="40" cy="40" r="36" stroke="#2D6A4F" stroke-width="2"/>
+                  <circle cx="40" cy="40" r="29" stroke="#52B788" stroke-width="1" stroke-dasharray="4 3"/>
+                  <text x="40" y="36" text-anchor="middle" fill="#2D6A4F" font-size="7" font-family="serif" font-weight="bold">REPROG</text>
+                  <text x="40" y="46" text-anchor="middle" fill="#2D6A4F" font-size="7" font-family="serif" font-weight="bold">FUTURO</text>
+                  <text x="40" y="56" text-anchor="middle" fill="#52B788" font-size="5" font-family="serif">✦ 2026 ✦</text>
+                </svg>
+              </div>
+            </div>
+            <div class="cert-footer-right">
+              {{#if certificado.turma.professor}}
+              <div class="cert-assinatura">
+                <div class="cert-assinatura-linha"></div>
+                <span class="cert-field-value">{{certificado.turma.professor.nome}}</span>
+                <span class="cert-field-label">Professor(a) Responsável</span>
+              </div>
+              {{/if}}
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- FIM CERTIFICADO -->
+
+  <div class="text-center mt-4 d-flex justify-content-center gap-3 flex-wrap">
+    <a href="/aluno/certificado/download" class="btn btn-eco btn-lg" id="btnDownloadCert">
+      <i class="bi bi-file-earmark-pdf me-2"></i>Baixar PDF
     </a>
-    <a href="/aluno/dashboard" class="btn btn-eco-secondary btn-lg ms-2">
-      <i class="bi bi-arrow-left me-2"></i>Voltar
+    <a href="/aluno/dashboard" class="btn btn-eco-secondary btn-lg">
+      <i class="bi bi-arrow-left me-2"></i>Voltar ao Dashboard
     </a>
   </div>
 </div>
