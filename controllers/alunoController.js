@@ -31,8 +31,11 @@ const alunoController = {
         todasAtividadesConcluidas = true;
       }
       if (matricula) {
-        const cert = await Certificado.findOne({ where: { alunoId, turmaId: matricula.turmaId } });
-        certificadoDisponivel = !!cert;
+        const cert = await Certificado.findOne({
+          where: { alunoId, turmaId: matricula.turmaId },
+          include: [{ model: Turma, as: 'turma', attributes: ['escola'] }]
+        });
+        certificadoDisponivel = !!cert && !!cert.turma && !!cert.turma.escola && cert.turma.escola.trim().length >= 3;
       }
       res.render('aluno/dashboard', {
         title: 'Dashboard - Aluno', aluno: aluno.toJSON(),
@@ -232,7 +235,13 @@ const alunoController = {
       const media = respostas.length > 0 ? totalPontos / respostas.length : 0;
       let certificado = null;
       if (matricula) {
-        certificado = await Certificado.findOne({ where: { alunoId, turmaId: matricula.turmaId } });
+        certificado = await Certificado.findOne({
+          where: { alunoId, turmaId: matricula.turmaId },
+          include: [{ model: Turma, as: 'turma', attributes: ['escola'] }]
+        });
+        if (certificado && (!certificado.turma || !certificado.turma.escola || certificado.turma.escola.trim().length < 3)) {
+          certificado = null;
+        }
       }
       res.render('aluno/perfil', {
         title: 'Meu Perfil', aluno: aluno.toJSON(), matricula: matricula ? matricula.toJSON() : null,
@@ -254,6 +263,12 @@ const alunoController = {
         order: [['geradoEm', 'DESC']]
       });
       if (!certificado) { req.session.mensagemErro = 'Certificado não disponível ainda.'; return res.redirect('/aluno/dashboard'); }
+
+      // Validação obrigatória da escola: não permite visualizar se o professor não informou
+      if (!certificado.turma || !certificado.turma.escola || certificado.turma.escola.trim().length < 3) {
+        req.session.mensagemErro = 'Certificado pendente: o professor responsável precisa informar os dados da escola para liberação.';
+        return res.redirect('/aluno/dashboard');
+      }
 
       // Recalcula a média atual com todas as respostas finalizadas da turma
       const respostasAtuais = await RespostaAtividade.findAll({
@@ -282,6 +297,12 @@ const alunoController = {
         order: [['geradoEm', 'DESC']]
       });
       if (!certificado) { req.session.mensagemErro = 'Certificado não encontrado.'; return res.redirect('/aluno/dashboard'); }
+
+      // Validação obrigatória da escola: não permite emitir/baixar se o professor não informou
+      if (!certificado.turma || !certificado.turma.escola || certificado.turma.escola.trim().length < 3) {
+        req.session.mensagemErro = 'Não foi possível emitir o certificado: o professor responsável precisa informar o nome da escola.';
+        return res.redirect('/aluno/dashboard');
+      }
 
       // Garante que o PDF sempre usa a média mais atual
       const respostasAtuais = await RespostaAtividade.findAll({

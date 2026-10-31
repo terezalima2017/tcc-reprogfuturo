@@ -23,7 +23,9 @@ const Turma = sequelize.define('Turma', {
   escola: {
     type: DataTypes.STRING(150),
     allowNull: true,
-    defaultValue: 'Escola Municipal de Ensino Fundamental'
+    validate: {
+      len: { args: [3, 150], msg: 'O nome da escola deve ter entre 3 e 150 caracteres.' }
+    }
   },
   professorId: {
     type: DataTypes.INTEGER,

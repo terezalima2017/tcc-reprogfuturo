@@ -753,9 +753,6 @@ const professorController = {
         ]
       });
 
-
-
-
       const totalAtividadesTurma = turma.atividadesAssociadas.length;
 
       // Para cada aluno, contar atividades realizadas e calcular média
@@ -886,6 +883,12 @@ const professorController = {
       if (!turma) {
         req.session.mensagemErro = 'Acesso negado.';
         return res.redirect('/professor/relatorios');
+      }
+
+      // Validação obrigatória: escola deve estar preenchida
+      if (!turma.escola || turma.escola.trim().length < 3) {
+        req.session.mensagemErro = '⚠️ Informe o nome da escola antes de emitir ou baixar o certificado.';
+        return res.redirect(`/professor/relatorios/turma/${turmaId}`);
       }
 
       const certificado = await Certificado.findOne({

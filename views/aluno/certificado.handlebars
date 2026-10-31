@@ -2,109 +2,209 @@
 
   <div class="cert-page-header text-center mb-4">
     <h2 class="fw-bold" style="color: var(--eco-primary);"><i class="bi bi-award me-2"></i>Meu Certificado</h2>
-    <p class="text-muted mb-0">Clique em "Baixar PDF" para salvar ou imprimir seu certificado</p>
+    <p class="text-muted mb-0">Certificado oficial de conclusão e aprendizagem ambiental</p>
   </div>
 
-  <!-- CERTIFICADO -->
+  <!-- CERTIFICADO OFICIAL -->
   <div class="cert-wrap">
     <div class="cert-doc" id="certificadoPreview">
 
-      <!-- Borda externa ornamental -->
+      <!-- Molduras duplas -->
       <div class="cert-border-outer">
-        <div class="cert-border-inner">
-
-          <!-- Cabeçalho institucional -->
-          <div class="cert-header">
-            <div class="cert-logo-leaf" aria-hidden="true">
-              <svg viewBox="0 0 64 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M32 4C32 4 10 18 10 42C10 58 20 70 32 76C44 70 54 58 54 42C54 18 32 4 32 4Z" fill="#2D6A4F" opacity="0.18"/>
-                <path d="M32 10C32 10 14 22 14 43C14 57 22 68 32 74" stroke="#2D6A4F" stroke-width="2.5" stroke-linecap="round"/>
-                <path d="M32 10C32 10 50 22 50 43C50 57 42 68 32 74" stroke="#40916C" stroke-width="1.5" stroke-linecap="round"/>
-                <line x1="32" y1="74" x2="32" y2="20" stroke="#52B788" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="3 4"/>
-                <path d="M32 35 Q22 28 18 20" stroke="#52B788" stroke-width="1.2" stroke-linecap="round"/>
-                <path d="M32 45 Q20 40 16 32" stroke="#52B788" stroke-width="1.2" stroke-linecap="round"/>
-                <path d="M32 35 Q42 28 46 20" stroke="#40916C" stroke-width="1.2" stroke-linecap="round"/>
-                <path d="M32 48 Q44 42 48 33" stroke="#40916C" stroke-width="1.2" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <div class="cert-brand">
-              <span class="cert-brand-name">ReProgFuturo</span>
-              <span class="cert-brand-sub">Plataforma de Educação Ambiental</span>
-            </div>
-            <div class="cert-escola-box">
-              {{#if certificado.turma.escola}}
-              <span class="cert-escola-text">{{certificado.turma.escola}}</span>
-              {{/if}}
-            </div>
-          </div>
-
-          <!-- Linha ornamental -->
-          <div class="cert-ornament-line">
-            <span class="cert-orn-leaf">❧</span>
-          </div>
-
-          <!-- Título principal -->
-          <div class="cert-title-area">
-            <h1 class="cert-title-main">Certificado de Aprendizado Ambiental</h1>
-          </div>
-
-          <!-- Corpo do certificado -->
-          <div class="cert-body">
-            <p class="cert-intro-text">Certificamos que</p>
-
-            <div class="cert-aluno-name-block">
-              <p class="cert-aluno-nome">{{certificado.aluno.nome}}</p>
-              <div class="cert-nome-underline"></div>
-            </div>
-
-            <div class="cert-descricao">
-              <p>
-                estudante da <strong>{{#if certificado.turma.escola}}{{certificado.turma.escola}}{{else}}instituição de ensino{{/if}}</strong>,
-                turma <strong>{{certificado.turma.nome}}</strong>, concluiu as atividades educativas da
-                plataforma <strong>ReProgFuturo</strong>, demonstrando aprendizado sobre
-                <em>educação ambiental</em>, <em>sustentabilidade</em>,
-                <em>preservação do meio ambiente</em> e <em>cidadania</em>.
-              </p>
-            </div>
-          </div>
-
-          <!-- Linha ornamental inferior -->
-          <div class="cert-ornament-line">
-            <span class="cert-orn-leaf">❧</span>
-          </div>
-
-          <!-- Rodapé com assinatura e data -->
-          <div class="cert-footer">
-            <div class="cert-footer-left">
-              <div class="cert-data-field">
-                <span class="cert-field-label">Data de Emissão</span>
-                <span class="cert-field-value">{{formatDateExtenso certificado.geradoEm}}</span>
-              </div>
-            </div>
-            <div class="cert-footer-center cert-sigilo">
-              <div class="cert-selo">
-                <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" width="70" height="70">
-                  <circle cx="40" cy="40" r="36" stroke="#2D6A4F" stroke-width="2"/>
-                  <circle cx="40" cy="40" r="29" stroke="#52B788" stroke-width="1" stroke-dasharray="4 3"/>
-                  <text x="40" y="36" text-anchor="middle" fill="#2D6A4F" font-size="7" font-family="serif" font-weight="bold">REPROG</text>
-                  <text x="40" y="46" text-anchor="middle" fill="#2D6A4F" font-size="7" font-family="serif" font-weight="bold">FUTURO</text>
-                  <text x="40" y="56" text-anchor="middle" fill="#52B788" font-size="5" font-family="serif">✦ 2026 ✦</text>
-                </svg>
-              </div>
-            </div>
-            <div class="cert-footer-right">
-              {{#if certificado.turma.professor}}
-              <div class="cert-assinatura">
-                <div class="cert-assinatura-linha"></div>
-                <span class="cert-field-value">{{certificado.turma.professor.nome}}</span>
-                <span class="cert-field-label">Professor(a) Responsável</span>
-              </div>
-              {{/if}}
-            </div>
-          </div>
-
-        </div>
+        <div class="cert-border-inner"></div>
       </div>
+
+      <!-- Cantoneiras decorativas (Circuitos Tecnológicos + Folhas Ambientais) -->
+      <!-- Canto Superior Esquerdo -->
+      <div class="cert-corner cert-corner-tl" aria-hidden="true">
+        <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Trilhas de circuito -->
+          <g stroke="#2D6A4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M 8 95 L 8 40 L 40 40 L 40 16 L 75 16" />
+            <path d="M 22 125 L 22 65 L 65 65 L 65 28 L 105 28" />
+            <path d="M 40 135 L 40 92 L 85 92 L 85 45 L 125 45" />
+          </g>
+          <!-- Nós circulares -->
+          <g fill="#FAF8F2" stroke="#2D6A4F" stroke-width="2">
+            <circle cx="75" cy="16" r="3.5" />
+            <circle cx="105" cy="28" r="3.5" />
+            <circle cx="125" cy="45" r="3.5" />
+            <circle cx="8" cy="95" r="3.5" />
+            <circle cx="22" cy="125" r="3.5" />
+            <circle cx="40" cy="135" r="3.5" />
+          </g>
+          <!-- Folhas verdes decorativas -->
+          <!-- Folha 1 (superior) -->
+          <path d="M 12 12 C 28 8 50 14 62 32 C 64 36 60 44 54 44 C 38 44 22 34 12 12 Z" fill="#2D6A4F" stroke="#1B4332" stroke-width="1.5" />
+          <path d="M 16 16 Q 40 28 58 38" stroke="#1B4332" stroke-width="1.2" stroke-linecap="round" />
+          <path d="M 30 23 Q 28 32 38 36" stroke="#52B788" stroke-width="0.9" />
+          <path d="M 42 29 Q 44 38 52 40" stroke="#52B788" stroke-width="0.9" />
+
+          <!-- Folha 2 (central grande) -->
+          <path d="M 10 10 C 18 35 32 60 52 68 C 58 70 64 62 60 54 C 50 36 32 20 10 10 Z" fill="#40916C" stroke="#1B4332" stroke-width="1.5" />
+          <path d="M 14 14 Q 36 42 56 62" stroke="#1B4332" stroke-width="1.2" stroke-linecap="round" />
+          <path d="M 26 28 Q 22 38 32 46" stroke="#74C69D" stroke-width="0.9" />
+          <path d="M 38 42 Q 36 52 46 58" stroke="#74C69D" stroke-width="0.9" />
+
+          <!-- Folha 3 (inferior) -->
+          <path d="M 10 10 C 8 28 14 50 32 62 C 36 64 44 60 44 54 C 44 38 34 22 12 10 Z" fill="#52B788" stroke="#1B4332" stroke-width="1.5" />
+          <path d="M 14 14 Q 26 36 38 56" stroke="#1B4332" stroke-width="1.2" stroke-linecap="round" />
+        </svg>
+      </div>
+
+      <!-- Canto Superior Direito -->
+      <div class="cert-corner cert-corner-tr" aria-hidden="true">
+        <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g stroke="#2D6A4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M 8 95 L 8 40 L 40 40 L 40 16 L 75 16" />
+            <path d="M 22 125 L 22 65 L 65 65 L 65 28 L 105 28" />
+            <path d="M 40 135 L 40 92 L 85 92 L 85 45 L 125 45" />
+          </g>
+          <g fill="#FAF8F2" stroke="#2D6A4F" stroke-width="2">
+            <circle cx="75" cy="16" r="3.5" />
+            <circle cx="105" cy="28" r="3.5" />
+            <circle cx="125" cy="45" r="3.5" />
+            <circle cx="8" cy="95" r="3.5" />
+            <circle cx="22" cy="125" r="3.5" />
+            <circle cx="40" cy="135" r="3.5" />
+          </g>
+          <path d="M 12 12 C 28 8 50 14 62 32 C 64 36 60 44 54 44 C 38 44 22 34 12 12 Z" fill="#2D6A4F" stroke="#1B4332" stroke-width="1.5" />
+          <path d="M 16 16 Q 40 28 58 38" stroke="#1B4332" stroke-width="1.2" stroke-linecap="round" />
+          <path d="M 30 23 Q 28 32 38 36" stroke="#52B788" stroke-width="0.9" />
+          <path d="M 42 29 Q 44 38 52 40" stroke="#52B788" stroke-width="0.9" />
+          <path d="M 10 10 C 18 35 32 60 52 68 C 58 70 64 62 60 54 C 50 36 32 20 10 10 Z" fill="#40916C" stroke="#1B4332" stroke-width="1.5" />
+          <path d="M 14 14 Q 36 42 56 62" stroke="#1B4332" stroke-width="1.2" stroke-linecap="round" />
+          <path d="M 26 28 Q 22 38 32 46" stroke="#74C69D" stroke-width="0.9" />
+          <path d="M 38 42 Q 36 52 46 58" stroke="#74C69D" stroke-width="0.9" />
+          <path d="M 10 10 C 8 28 14 50 32 62 C 36 64 44 60 44 54 C 44 38 34 22 12 10 Z" fill="#52B788" stroke="#1B4332" stroke-width="1.5" />
+          <path d="M 14 14 Q 26 36 38 56" stroke="#1B4332" stroke-width="1.2" stroke-linecap="round" />
+        </svg>
+      </div>
+
+      <!-- Canto Inferior Esquerdo -->
+      <div class="cert-corner cert-corner-bl" aria-hidden="true">
+        <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g stroke="#2D6A4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M 8 95 L 8 40 L 40 40 L 40 16 L 75 16" />
+            <path d="M 22 125 L 22 65 L 65 65 L 65 28 L 105 28" />
+            <path d="M 40 135 L 40 92 L 85 92 L 85 45 L 125 45" />
+          </g>
+          <g fill="#FAF8F2" stroke="#2D6A4F" stroke-width="2">
+            <circle cx="75" cy="16" r="3.5" />
+            <circle cx="105" cy="28" r="3.5" />
+            <circle cx="125" cy="45" r="3.5" />
+            <circle cx="8" cy="95" r="3.5" />
+            <circle cx="22" cy="125" r="3.5" />
+            <circle cx="40" cy="135" r="3.5" />
+          </g>
+          <path d="M 12 12 C 28 8 50 14 62 32 C 64 36 60 44 54 44 C 38 44 22 34 12 12 Z" fill="#2D6A4F" stroke="#1B4332" stroke-width="1.5" />
+          <path d="M 16 16 Q 40 28 58 38" stroke="#1B4332" stroke-width="1.2" stroke-linecap="round" />
+          <path d="M 30 23 Q 28 32 38 36" stroke="#52B788" stroke-width="0.9" />
+          <path d="M 42 29 Q 44 38 52 40" stroke="#52B788" stroke-width="0.9" />
+          <path d="M 10 10 C 18 35 32 60 52 68 C 58 70 64 62 60 54 C 50 36 32 20 10 10 Z" fill="#40916C" stroke="#1B4332" stroke-width="1.5" />
+          <path d="M 14 14 Q 36 42 56 62" stroke="#1B4332" stroke-width="1.2" stroke-linecap="round" />
+          <path d="M 26 28 Q 22 38 32 46" stroke="#74C69D" stroke-width="0.9" />
+          <path d="M 38 42 Q 36 52 46 58" stroke="#74C69D" stroke-width="0.9" />
+          <path d="M 10 10 C 8 28 14 50 32 62 C 36 64 44 60 44 54 C 44 38 34 22 12 10 Z" fill="#52B788" stroke="#1B4332" stroke-width="1.5" />
+          <path d="M 14 14 Q 26 36 38 56" stroke="#1B4332" stroke-width="1.2" stroke-linecap="round" />
+        </svg>
+      </div>
+
+      <!-- Canto Inferior Direito -->
+      <div class="cert-corner cert-corner-br" aria-hidden="true">
+        <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g stroke="#2D6A4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M 8 95 L 8 40 L 40 40 L 40 16 L 75 16" />
+            <path d="M 22 125 L 22 65 L 65 65 L 65 28 L 105 28" />
+            <path d="M 40 135 L 40 92 L 85 92 L 85 45 L 125 45" />
+          </g>
+          <g fill="#FAF8F2" stroke="#2D6A4F" stroke-width="2">
+            <circle cx="75" cy="16" r="3.5" />
+            <circle cx="105" cy="28" r="3.5" />
+            <circle cx="125" cy="45" r="3.5" />
+            <circle cx="8" cy="95" r="3.5" />
+            <circle cx="22" cy="125" r="3.5" />
+            <circle cx="40" cy="135" r="3.5" />
+          </g>
+          <path d="M 12 12 C 28 8 50 14 62 32 C 64 36 60 44 54 44 C 38 44 22 34 12 12 Z" fill="#2D6A4F" stroke="#1B4332" stroke-width="1.5" />
+          <path d="M 16 16 Q 40 28 58 38" stroke="#1B4332" stroke-width="1.2" stroke-linecap="round" />
+          <path d="M 30 23 Q 28 32 38 36" stroke="#52B788" stroke-width="0.9" />
+          <path d="M 42 29 Q 44 38 52 40" stroke="#52B788" stroke-width="0.9" />
+          <path d="M 10 10 C 18 35 32 60 52 68 C 58 70 64 62 60 54 C 50 36 32 20 10 10 Z" fill="#40916C" stroke="#1B4332" stroke-width="1.5" />
+          <path d="M 14 14 Q 36 42 56 62" stroke="#1B4332" stroke-width="1.2" stroke-linecap="round" />
+          <path d="M 26 28 Q 22 38 32 46" stroke="#74C69D" stroke-width="0.9" />
+          <path d="M 38 42 Q 36 52 46 58" stroke="#74C69D" stroke-width="0.9" />
+          <path d="M 10 10 C 8 28 14 50 32 62 C 36 64 44 60 44 54 C 44 38 34 22 12 10 Z" fill="#52B788" stroke="#1B4332" stroke-width="1.5" />
+          <path d="M 14 14 Q 26 36 38 56" stroke="#1B4332" stroke-width="1.2" stroke-linecap="round" />
+        </svg>
+      </div>
+
+      <!-- Conteúdo central do Certificado -->
+      <div class="cert-body-wrap">
+
+        <!-- Logotipo Central: Reciclagem + Folhas + Marca -->
+        <div class="cert-brand-center">
+          <div class="cert-recycle-logo">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" width="56" height="56">
+              <!-- 3 Setas circulares de reciclagem -->
+              <g stroke="#1B4332" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+                <!-- Arco Superior -->
+                <path d="M 32 20 A 36 36 0 0 1 78 28" />
+                <path d="M 70 18 L 80 28 L 68 34" fill="#1B4332" />
+                <!-- Arco Direito / Inferior -->
+                <path d="M 85 45 A 36 36 0 0 1 50 86" />
+                <path d="M 58 92 L 48 86 L 56 76" fill="#1B4332" />
+                <!-- Arco Esquerdo -->
+                <path d="M 35 80 A 36 36 0 0 1 18 36" />
+                <path d="M 12 45 L 18 34 L 26 44" fill="#1B4332" />
+              </g>
+              <!-- Folhas verdes no interior do símbolo -->
+              <path d="M 48 64 C 44 48 30 40 32 28 C 42 30 52 42 50 64 Z" fill="#2D6A4F" />
+              <path d="M 49 64 C 54 48 70 42 68 28 C 58 32 48 44 49 64 Z" fill="#52B788" />
+              <path d="M 49 64 L 49 34" stroke="#1B4332" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+          </div>
+          <div class="cert-brand-title">ReProgFuturo</div>
+        </div>
+
+        <!-- Título do Certificado -->
+        <div class="cert-title-section">
+          <h1 class="cert-title-main">
+            CERTIFICADO DE<br>
+            CONCLUSÃO AMBIENTAL
+          </h1>
+          <div class="cert-leaves-divider">
+            <svg viewBox="0 0 40 20" width="34" height="17" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M 20 18 C 16 12 8 8 10 2 C 16 4 21 10 20 18 Z" fill="#2D6A4F" />
+              <path d="M 20 18 C 24 12 32 8 30 2 C 24 4 19 10 20 18 Z" fill="#40916C" />
+            </svg>
+          </div>
+          <p class="cert-title-sub">Certificado de participação e aprendizagem</p>
+        </div>
+
+        <!-- Corpo: Certificamos que + Aluno + Declaração -->
+        <div class="cert-statement-section">
+          <p class="cert-intro-text">Certificamos que</p>
+          <div class="cert-student-name">{{certificado.aluno.nome}}</div>
+          <p class="cert-text-statement">
+            concluiu com sucesso as atividades ambientais da turma <strong>{{certificado.turma.nome}}</strong> da escola <strong>{{certificado.turma.escola}}</strong>, demonstrando dedicação, aprendizado e compromisso com o meio ambiente.
+          </p>
+        </div>
+
+        <!-- Rodapé: Data e Assinatura centralizados -->
+        <div class="cert-footer-center">
+          <div class="cert-footer-date">{{formatDateExtenso certificado.geradoEm}}</div>
+          <div class="cert-footer-line"></div>
+          <div class="cert-footer-sig-text">
+            {{#if certificado.turma.professor}}
+              <div class="cert-prof-nome">{{certificado.turma.professor.nome}}</div>
+            {{/if}}
+            <div class="cert-prof-cargo">Professor(a) responsável</div>
+          </div>
+        </div>
+
+      </div>
+
     </div>
   </div>
   <!-- FIM CERTIFICADO -->

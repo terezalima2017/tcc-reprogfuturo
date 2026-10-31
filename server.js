@@ -14,7 +14,7 @@ async function iniciar() {
     // Sincroniza modelos (cria tabelas se não existirem)
     await sequelize.sync();
     try {
-      await sequelize.query("ALTER TABLE turmas ADD COLUMN escola VARCHAR(150) DEFAULT 'Escola Municipal de Ensino Fundamental';");
+      await sequelize.query("ALTER TABLE turmas ADD COLUMN escola VARCHAR(150);");
     } catch (_) {
       // Ignora caso a coluna já exista
     }
