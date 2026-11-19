@@ -1,4 +1,4 @@
-const { Usuario, Atividade, LixoMisterioso, CacaPalavras, VerdadeiroFalso, MultiplaEscolha, DesafioDiario, Turma, AlunoTurma, sequelize } = require('../models');
+const { Usuario, Atividade, AtividadeTurma, RespostaAtividade, LixoMisterioso, CacaPalavras, VerdadeiroFalso, MultiplaEscolha, DesafioDiario, Turma, AlunoTurma, sequelize } = require('../models');
 const usuarioService = require('../services/usuarioService');
 const upload = require('../middlewares/upload');
 
@@ -44,10 +44,11 @@ const adminController = {
       const totalProfessores = await Usuario.count({ where: { tipo: 'professor' } });
       const totalTurmas = await Turma.count();
       const totalTemplates = await Atividade.count({ where: { isTemplate: true } });
+      const totalAtividades = await Atividade.count();
 
       res.render('admin/dashboard', {
         title: 'Dashboard - Admin',
-        totalUsuarios, totalAlunos, totalProfessores, totalTurmas, totalTemplates
+        totalUsuarios, totalAlunos, totalProfessores, totalTurmas, totalTemplates, totalAtividades
       });
     } catch (error) {
       console.error('Erro:', error);
@@ -59,15 +60,26 @@ const adminController = {
   listarAtividades: async (req, res) => {
     try {
       const atividades = await Atividade.findAll({
-        where: { isTemplate: true },
+        include: [
+          { model: Usuario, as: 'criador', attributes: ['nome', 'tipo'] },
+          { model: RespostaAtividade, as: 'respostas', attributes: ['id'] }
+        ],
         order: [['createdAt', 'DESC']]
       });
+
+      const lista = atividades.map(a => {
+        const item = a.toJSON();
+        item.totalRespostas = item.respostas ? item.respostas.length : 0;
+        item.podeExcluir = item.totalRespostas === 0;
+        return item;
+      });
+
       res.render('admin/atividades', {
-        title: 'Atividades Prontas',
-        atividades: atividades.map(a => a.toJSON())
+        title: 'Gerenciar Atividades',
+        atividades: lista
       });
     } catch (error) {
-      console.error('Erro:', error);
+      console.error('Erro ao listar atividades:', error);
       req.session.mensagemErro = 'Erro ao carregar atividades.';
       res.redirect('/admin/dashboard');
     }
@@ -98,8 +110,10 @@ const adminController = {
   detalheAtividade: async (req, res) => {
     try {
       const atividade = await Atividade.findOne({
-        where: { id: req.params.id, isTemplate: true },
+        where: { id: req.params.id },
         include: [
+          { model: Usuario, as: 'criador', attributes: ['nome', 'tipo'] },
+          { model: RespostaAtividade, as: 'respostas', attributes: ['id'] },
           { model: LixoMisterioso, as: 'itensLixo' },
           { model: CacaPalavras, as: 'palavras' },
           { model: VerdadeiroFalso, as: 'afirmacoes' },
@@ -111,7 +125,10 @@ const adminController = {
         req.session.mensagemErro = 'Atividade não encontrada.';
         return res.redirect('/admin/atividades');
       }
-      res.render('admin/detalheAtividade', { title: atividade.nome, atividade: atividade.toJSON() });
+      const atividadeJson = atividade.toJSON();
+      atividadeJson.totalRespostas = atividadeJson.respostas ? atividadeJson.respostas.length : 0;
+      atividadeJson.podeExcluir = atividadeJson.totalRespostas === 0;
+      res.render('admin/detalheAtividade', { title: atividade.nome, atividade: atividadeJson });
     } catch (error) {
       console.error('Erro:', error);
       req.session.mensagemErro = 'Erro ao carregar atividade.';
@@ -121,7 +138,7 @@ const adminController = {
 
   formEditarAtividade: async (req, res) => {
     try {
-      const atividade = await Atividade.findOne({ where: { id: req.params.id, isTemplate: true } });
+      const atividade = await Atividade.findOne({ where: { id: req.params.id } });
       if (!atividade) {
         req.session.mensagemErro = 'Atividade não encontrada.';
         return res.redirect('/admin/atividades');
@@ -135,7 +152,7 @@ const adminController = {
 
   editarAtividade: async (req, res) => {
     try {
-      const atividade = await Atividade.findOne({ where: { id: req.params.id, isTemplate: true } });
+      const atividade = await Atividade.findOne({ where: { id: req.params.id } });
       if (!atividade) {
         req.session.mensagemErro = 'Atividade não encontrada.';
         return res.redirect('/admin/atividades');
@@ -145,7 +162,7 @@ const adminController = {
       atividade.descricao = descricao.trim();
       if (req.file) atividade.imagemUrl = upload.getFileUrl(req.file);
       await atividade.save();
-      req.session.mensagemSucesso = 'Atividade atualizada!';
+      req.session.mensagemSucesso = 'Atividade atualizada com sucesso!';
       res.redirect(`/admin/atividades/${atividade.id}`);
     } catch (error) {
       console.error('Erro:', error);
@@ -155,22 +172,45 @@ const adminController = {
 
   excluirAtividade: async (req, res) => {
     try {
-      const atividade = await Atividade.findOne({ where: { id: req.params.id, isTemplate: true } });
+      const { id } = req.params;
+      const atividade = await Atividade.findByPk(id);
+
       if (!atividade) {
-        req.session.mensagemErro = 'Atividade não encontrada.';
+        req.session.mensagemErro = 'Atividade não encontrada no banco de dados.';
         return res.redirect('/admin/atividades');
       }
-      await LixoMisterioso.destroy({ where: { atividadeId: atividade.id } });
-      await CacaPalavras.destroy({ where: { atividadeId: atividade.id } });
-      await VerdadeiroFalso.destroy({ where: { atividadeId: atividade.id } });
-      await MultiplaEscolha.destroy({ where: { atividadeId: atividade.id } });
-      await DesafioDiario.destroy({ where: { atividadeId: atividade.id } });
-      await atividade.destroy();
-      req.session.mensagemSucesso = 'Atividade excluída.';
-      res.redirect('/admin/atividades');
+
+      // Regra de Integridade: Verificar se há registros de participação, pontuações ou resultados de alunos
+      const totalRespostas = await RespostaAtividade.count({ where: { atividadeId: id } });
+      if (totalRespostas > 0) {
+        req.session.mensagemErro = `Não é possível excluir a atividade "${atividade.nome}". Ela possui ${totalRespostas} registro(s) de participação e pontuações de alunos associados. Para preservar o histórico escolar e evitar perda indevida de informações, a atividade não pode ser excluída.`;
+        return res.redirect('/admin/atividades');
+      }
+
+      // Exclusão efetiva e segura em transação
+      await sequelize.transaction(async (t) => {
+        // Remover associações de turmas
+        await AtividadeTurma.destroy({ where: { atividadeId: id }, transaction: t });
+
+        // Remover itens específicos dos jogos
+        await LixoMisterioso.destroy({ where: { atividadeId: id }, transaction: t });
+        await CacaPalavras.destroy({ where: { atividadeId: id }, transaction: t });
+        await VerdadeiroFalso.destroy({ where: { atividadeId: id }, transaction: t });
+        await MultiplaEscolha.destroy({ where: { atividadeId: id }, transaction: t });
+        await DesafioDiario.destroy({ where: { atividadeId: id }, transaction: t });
+
+        // Excluir efetivamente a atividade do banco de dados
+        await atividade.destroy({ transaction: t });
+      });
+
+      console.log(`[AUDITORIA] Administrador ${req.session.usuario.nome} (ID: ${req.session.usuario.id}) excluiu permanentemente a atividade "${atividade.nome}" (ID: ${id}) em ${new Date().toISOString()}`);
+
+      req.session.mensagemSucesso = `Atividade "${atividade.nome}" excluída com sucesso!`;
+      return res.redirect('/admin/atividades');
     } catch (error) {
-      console.error('Erro:', error);
-      res.redirect('/admin/atividades');
+      console.error('Erro ao excluir atividade:', error);
+      req.session.mensagemErro = 'Ocorreu um erro ao excluir a atividade. Tente novamente.';
+      return res.redirect('/admin/atividades');
     }
   },
 

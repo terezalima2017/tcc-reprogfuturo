@@ -2,8 +2,10 @@ const app = require('./app');
 const { sequelize } = require('./models');
 const { sessionStore } = require('./config/session');
 const seedAdmin = require('./seeders/admin-seed');
+const { getLocalNetworkAddresses } = require('./middlewares/networkHelper');
 
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || '0.0.0.0';
 
 async function iniciar() {
   try {
@@ -29,9 +31,25 @@ async function iniciar() {
 
     // Inicia o servidor (apenas se não for ambiente serverless)
     if (!process.env.VERCEL) {
-      app.listen(PORT, () => {
-        console.log(`🌿 ReProgFuturo rodando em http://localhost:${PORT}`);
+      app.listen(PORT, HOST, () => {
+        console.log(`\n🌿 ReProgFuturo iniciado com sucesso!`);
         console.log(`🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);
+        console.log(`📡 Endereços de acesso disponíveis:`);
+        console.log(`   - Local (neste computador): http://localhost:${PORT}`);
+        
+        const localAddresses = getLocalNetworkAddresses();
+        if (localAddresses.length > 0) {
+          localAddresses.forEach(net => {
+            console.log(`   - Rede Escolar / LAN (${net.interface}): http://${net.address}:${PORT}`);
+          });
+        }
+        
+        if (process.env.PUBLIC_URL) {
+          console.log(`   - Endereço Público / WAN: ${process.env.PUBLIC_URL}`);
+        } else {
+          console.log(`   - Endereço Público / WAN: http://[SEU_IP_PUBLICO]:${PORT} (via Hairpin NAT)`);
+        }
+        console.log(`🔍 Diagnóstico de rede disponível em: /api/rede/diagnostico\n`);
       });
     }
   } catch (error) {

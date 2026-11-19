@@ -367,33 +367,13 @@ const professorController = {
     }
   },
 
-  // Excluir atividade
+  // Excluir atividade - Bloqueado: Apenas o Administrador pode excluir atividades
   excluirAtividade: async (req, res) => {
-    try {
-      const atividade = await Atividade.findOne({
-        where: { id: req.params.id, criadorId: req.session.usuario.id }
-      });
-      if (!atividade) {
-        req.session.mensagemErro = 'Atividade não encontrada.';
-        return res.redirect('/professor/atividades');
-      }
-
-      // Remover itens relacionados
-      await LixoMisterioso.destroy({ where: { atividadeId: atividade.id } });
-      await CacaPalavras.destroy({ where: { atividadeId: atividade.id } });
-      await VerdadeiroFalso.destroy({ where: { atividadeId: atividade.id } });
-      await MultiplaEscolha.destroy({ where: { atividadeId: atividade.id } });
-      await DesafioDiario.destroy({ where: { atividadeId: atividade.id } });
-      await AtividadeTurma.destroy({ where: { atividadeId: atividade.id } });
-      await atividade.destroy();
-
-      req.session.mensagemSucesso = 'Atividade excluída com sucesso.';
-      res.redirect('/professor/atividades');
-    } catch (error) {
-      console.error('Erro ao excluir atividade:', error);
-      req.session.mensagemErro = 'Erro ao excluir atividade.';
-      res.redirect('/professor/atividades');
-    }
+    return res.status(403).render('error', {
+      title: 'Acesso Negado',
+      statusCode: 403,
+      message: 'Somente o administrador tem permissão para excluir atividades da plataforma.'
+    });
   },
 
   // Formulário de associar atividade a turmas

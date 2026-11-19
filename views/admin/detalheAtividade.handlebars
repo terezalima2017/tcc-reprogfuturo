@@ -52,10 +52,20 @@
     </div>
   </div>
 
-  <div class="mt-4">
-    <form action="/admin/atividades/{{atividade.id}}/excluir" method="POST" onsubmit="return confirm('Excluir atividade?')">
-      <button class="btn btn-eco-danger"><i class="bi bi-trash me-1"></i>Excluir Atividade</button>
+  <div class="mt-4 p-3 rounded bg-light border d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+      <h6 class="fw-bold mb-1 text-danger"><i class="bi bi-exclamation-triangle me-1"></i>Zona de Moderação</h6>
+      <small class="text-muted">A exclusão da atividade remove todos os registros associados do banco de dados. Caso haja participações de alunos, a exclusão é automaticamente protegida.</small>
+    </div>
+    {{#if atividade.podeExcluir}}
+    <form action="/admin/atividades/{{atividade.id}}/excluir" method="POST" onsubmit="return confirm('ATENÇÃO: Deseja realmente excluir permanentemente a atividade \'{{atividade.nome}}\' do banco de dados? Esta ação não poderá ser desfeita.')">
+      <button type="submit" class="btn btn-eco-danger"><i class="bi bi-trash me-1"></i>Excluir atividade</button>
     </form>
+    {{else}}
+    <button type="button" class="btn btn-secondary" disabled title="Esta atividade possui registros de alunos e não pode ser excluída.">
+      <i class="bi bi-shield-lock me-1"></i>Exclusão Bloqueada ({{atividade.totalRespostas}} participações)
+    </button>
+    {{/if}}
   </div>
 </div>
 

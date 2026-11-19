@@ -24,7 +24,14 @@ router.post('/atividades', upload.single('imagem'), professorController.criarAti
 router.get('/atividades/:id', professorController.detalheAtividade);
 router.get('/atividades/:id/editar', professorController.formEditarAtividade);
 router.post('/atividades/:id', upload.single('imagem'), professorController.editarAtividade);
-router.post('/atividades/:id/excluir', professorController.excluirAtividade);
+// Exclusão de atividades - Restrito exclusivamente ao perfil administrador
+router.post('/atividades/:id/excluir', (req, res) => {
+  return res.status(403).render('error', {
+    title: 'Acesso Negado',
+    statusCode: 403,
+    message: 'Somente o administrador tem permissão para excluir atividades da plataforma.'
+  });
+});
 
 // Associar atividade a turmas
 router.get('/atividades/:id/associar', professorController.formAssociarAtividade);

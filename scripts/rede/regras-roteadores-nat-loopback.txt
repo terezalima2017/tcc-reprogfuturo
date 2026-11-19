@@ -1,0 +1,96 @@
+================================================================================
+GUIA PRÁTICO DE REGRAS DE ROTEADORES: NAT LOOPBACK (HAIRPIN NAT) E SPLIT-DNS
+Sistema ReProgFuturo - Suporte a Acesso Simultâneo Escolar
+================================================================================
+
+Este guia fornece os comandos e configurações exatas para os roteadores e gateways
+mais comuns utilizados em escolas e instituições de ensino.
+
+Parâmetros de Exemplo (substitua pelos dados da sua rede):
+- IP Local do Servidor ReProgFuturo: 192.168.1.47
+- Porta da Aplicação:               3000 (ou 80/443 se usar proxy reverso)
+- Sub-rede LAN da Escola:           192.168.1.0/24
+- Interface LAN:                    bridge / lan / eth1
+- IP Público WAN (ou Interface WAN): ether1 / wan / [IP_PUBLICO]
+- Domínio (se houver):               reprogfuturo.escola.edu.br
+
+--------------------------------------------------------------------------------
+1. MIKROTIK ROUTEROS (Muito comum em escolas e provedores)
+--------------------------------------------------------------------------------
+No MikroTik, a falta da regra de "srcnat masquerade" para a própria rede LAN
+é a causa exata do problema de Hairpin NAT.
+
+Abra o Terminal do WinBox ou SSH e execute:
+
+# Passo 1: Regra de Port Forward (dstnat) existente ou nova
+/ip firewall nat add chain=dstnat action=dst-nat \
+   dst-address-type=local dst-address=[SEU_IP_PUBLICO] protocol=tcp dst-port=3000 \
+   to-addresses=192.168.1.47 to-ports=3000 comment="ReProgFuturo - Port Forward"
+
+# Passo 2: REGRA CRUCIAL DE HAIRPIN NAT (srcnat)
+# Sem esta regra, o servidor responde direto ao cliente LAN e o cliente envia TCP RST!
+/ip firewall nat add chain=srcnat action=masquerade \
+   protocol=tcp src-address=192.168.1.0/24 dst-address=192.168.1.47 dst-port=3000 \
+   out-interface-list=LAN comment="ReProgFuturo - Hairpin NAT / NAT Loopback"
+
+--------------------------------------------------------------------------------
+2. PFSENSE / OPNSENSE (Firewalls corporativos / estaduais)
+--------------------------------------------------------------------------------
+O pfSense possui suporte nativo a NAT Reflection, mas frequentemente vem desativado
+ou configurado apenas para redes WAN.
+
+Opção Recomendada no pfSense:
+1. Acesse o painel web: System > Advanced > Firewall & NAT.
+2. Na seção "Network Address Translation":
+   - NAT Reflection mode for port forwards: Selecione "Pure NAT".
+   - Enable NAT Reflection for 1:1 NAT: Marque a caixa.
+   - Enable automatic outbound NAT for Reflection: MARQUE ESTA CAIXA (obrigatório!).
+3. Clique em "Save" no rodapé.
+4. Na regra de Port Forward correspondente (Firewall > NAT > Port Forward):
+   - Certifique-se de que "Filter rule association" esteja como "Rule NAT ...".
+   - No campo "NAT reflection", deixe como "Use system default" ou selecione "Enable (Pure NAT)".
+
+--------------------------------------------------------------------------------
+3. OPENWRT (Roteadores com firmware aberto)
+--------------------------------------------------------------------------------
+No OpenWrt, o NAT loopback já é suportado via UCI / LuCI:
+
+Via LuCI (Interface Web):
+1. Network > Firewall > Port Forwards > Edite a regra da porta 3000.
+2. Marque a opção "Enable NAT Loopback".
+3. Salve e Aplique.
+
+Via SSH / Terminal:
+uci set firewall.@redirect[-1].reflection='1'
+uci commit firewall
+/etc/init.d/firewall restart
+
+--------------------------------------------------------------------------------
+4. ROTEADORES COMERCIAIS (TP-Link, Intelbras, D-Link, Huawei, ZTE)
+--------------------------------------------------------------------------------
+Muitos roteadores residenciais ou SOHO (incluindo alguns modems de operadoras como
+Claro, Vivo, Oi) NÃO possuem suporte a Hairpin NAT no firmware.
+Se o roteador não tiver a opção "NAT Loopback" ou "NAT Reflection" nas opções de WAN/NAT:
+
+SOLUÇÃO DEFINITIVA 1: SPLIT-HORIZON DNS (SPLIT-DNS)
+Esta é a melhor prática recomendada internacionalmente pela RFC 1918 e IETF.
+Em vez de sobrecarregar o roteador processando tradução de endereços duas vezes para
+dezenas de computadores da escola:
+
+1. No servidor DNS interno da escola (Pi-hole, AdGuard, Windows Server DNS, BIND ou dnsmasq):
+   Crie uma entrada DNS estática:
+   Nome:    sistema.escola.edu.br (ou seu domínio público)
+   Tipo:    A
+   Destino: 192.168.1.47
+
+Resultado:
+- Dispositivos FORA da escola resolvem o domínio para o IP Público (via DNS público).
+- Dispositivos DENTRO da escola resolvem o domínio diretamente para 192.168.1.47 (velocidade de rede local gigabit, sem sobrecarga no roteador).
+
+SOLUÇÃO DEFINITIVA 2: ACESSO DIRETO VIA IP LOCAL / NOME DE HOST NA LAN
+Caso a escola não utilize domínio próprio:
+- Alunos na rede escolar acessam: http://192.168.1.47:3000
+- O servidor ReProgFuturo agora possui bind em 0.0.0.0 e aceita conexões tanto pelo IP
+  local quanto pelo IP público.
+================================================================================
+

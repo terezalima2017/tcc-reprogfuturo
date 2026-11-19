@@ -188,11 +188,7 @@
     </div>
   </div>
 
-  <div class="mt-4">
-    <form action="/professor/atividades/{{atividade.id}}/excluir" method="POST" class="d-inline" onsubmit="return confirm('Excluir atividade e todos os itens?')">
-      <button class="btn btn-eco-danger"><i class="bi bi-trash me-1"></i>Excluir Atividade</button>
-    </form>
-  </div>
+
 </div>
 
 {{#if (eq atividade.tipo 'lixo_misterioso')}}

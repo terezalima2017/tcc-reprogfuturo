@@ -10,8 +10,17 @@ const sanitizeInput = require('./middlewares/sanitize');
 
 const app = express();
 
-// Confiar no proxy da Vercel para que cookies seguros funcionem corretamente
-if (process.env.NODE_ENV === 'production') {
+// ===== CONFIGURAÇÃO DE PROXY E REDE (NAT / HAIRPIN NAT) =====
+// Confia em proxies (reverse proxy, Vercel, Hairpin NAT gateway)
+// Permite que req.ip identifique corretamente o cliente ou gateway sem mascaramento errôneo
+if (process.env.TRUST_PROXY !== undefined) {
+  const tp = process.env.TRUST_PROXY;
+  if (tp === 'true') app.set('trust proxy', true);
+  else if (tp === 'false') app.set('trust proxy', false);
+  else if (!isNaN(Number(tp))) app.set('trust proxy', Number(tp));
+  else app.set('trust proxy', tp);
+} else {
+  // Padrão seguro para Vercel e roteadores NAT com proxy/SNAT
   app.set('trust proxy', 1);
 }
 
@@ -183,6 +192,32 @@ app.use('/professor', professorRoutes);
 app.use('/aluno', alunoRoutes);
 app.use('/admin', adminRoutes);
 app.use('/atividade', atividadeRoutes);
+
+// Rota de diagnóstico de rede (para verificar conectividade LAN/WAN/NAT)
+const { getClientIp, isPrivateIp, getLocalNetworkAddresses } = require('./middlewares/networkHelper');
+app.get('/api/rede/diagnostico', (req, res) => {
+  const clientIp = getClientIp(req);
+  const isLocal = isPrivateIp(clientIp);
+  res.json({
+    status: 'online',
+    timestamp: new Date().toISOString(),
+    cliente: {
+      ip: clientIp,
+      ipExpressReq: req.ip,
+      isRedePrivadaOuLocal: isLocal,
+      userAgent: req.headers['user-agent'] || 'desconhecido'
+    },
+    servidor: {
+      hostHeader: req.headers.host,
+      protocolo: req.protocol,
+      interfacesLocais: getLocalNetworkAddresses(),
+      porta: process.env.PORT || 3000
+    },
+    diagnosticoNat: isLocal
+      ? 'Acesso direto via Rede Local (LAN) ou com SNAT/Masquerade do roteador.'
+      : 'Acesso via IP Público / WAN. Para clientes na mesma rede do servidor, o Hairpin NAT (NAT Loopback) ou Split-DNS deve estar ativo no roteador.'
+  });
+});
 
 // Rota 404
 app.use((req, res) => {

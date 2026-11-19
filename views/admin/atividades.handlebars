@@ -1,24 +1,77 @@
 <div class="container py-4 fade-in-up">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold mb-0"><i class="bi bi-collection me-2"></i>Atividades Prontas</h2>
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+      <h2 class="fw-bold mb-1"><i class="bi bi-collection me-2"></i>Gerenciar Atividades</h2>
+      <p class="text-muted mb-0 small">Painel de controle e moderação de todas as atividades cadastradas na plataforma.</p>
+    </div>
     <a href="/admin/atividades/criar" class="btn btn-eco"><i class="bi bi-plus-lg me-2"></i>Criar Template</a>
   </div>
 
   {{#if atividades.length}}
-  <div class="row g-4">
+  <!-- Filtros Rápidos -->
+  <div class="mb-4">
+    <div class="btn-group" role="group" id="filtroAtividades">
+      <button type="button" class="btn btn-outline-success active btn-sm filtro-btn" data-filtro="todos">
+        <i class="bi bi-grid-fill me-1"></i>Todas ({{atividades.length}})
+      </button>
+      <button type="button" class="btn btn-outline-success btn-sm filtro-btn" data-filtro="template">
+        <i class="bi bi-star-fill me-1"></i>Templates
+      </button>
+      <button type="button" class="btn btn-outline-success btn-sm filtro-btn" data-filtro="professor">
+        <i class="bi bi-person-workspace me-1"></i>De Professores
+      </button>
+    </div>
+  </div>
+
+  <div class="row g-4" id="gridAtividades">
     {{#each atividades}}
-    <div class="col-md-6 col-lg-4">
-      <div class="eco-card h-100">
+    <div class="col-md-6 col-lg-4 card-atividade-item" data-origem="{{#if this.isTemplate}}template{{else}}professor{{/if}}">
+      <div class="eco-card h-100 d-flex flex-column shadow-sm">
         <div class="card-header d-flex justify-content-between align-items-center">
           <span class="badge badge-tipo badge-{{this.tipo}}">{{tipoAtividadeLabel this.tipo}}</span>
-          <span class="badge bg-warning text-dark">Template</span>
+          {{#if this.isTemplate}}
+          <span class="badge bg-warning text-dark"><i class="bi bi-star-fill me-1"></i>Template</span>
+          {{else}}
+          <span class="badge bg-info text-dark" title="Criada pelo professor {{this.criador.nome}}">
+            <i class="bi bi-person-fill me-1"></i>Prof. {{this.criador.nome}}
+          </span>
+          {{/if}}
         </div>
-        <div class="card-body">
-          <h5 class="fw-bold">{{this.nome}}</h5>
-          <p class="text-muted small">{{this.descricao}}</p>
-          <div class="d-flex gap-2">
-            <a href="/admin/atividades/{{this.id}}" class="btn btn-eco-secondary btn-sm"><i class="bi bi-eye me-1"></i>Ver</a>
-            <a href="/admin/atividades/{{this.id}}/editar" class="btn btn-eco-secondary btn-sm"><i class="bi bi-pencil me-1"></i>Editar</a>
+        <div class="card-body d-flex flex-column flex-grow-1">
+          <h5 class="fw-bold mb-2">{{this.nome}}</h5>
+          <p class="text-muted small flex-grow-1 mb-3">{{this.descricao}}</p>
+          
+          <!-- Indicador de Participação de Alunos -->
+          <div class="mb-3">
+            {{#if (gt this.totalRespostas 0)}}
+            <span class="badge bg-secondary" title="Atividade com histórico de respostas">
+              <i class="bi bi-people-fill me-1"></i>{{this.totalRespostas}} participação(ões) registrada(s)
+            </span>
+            {{else}}
+            <span class="badge bg-light text-muted border">
+              <i class="bi bi-check2-circle me-1"></i>Sem participações (segura para exclusão)
+            </span>
+            {{/if}}
+          </div>
+
+          <div class="d-flex gap-2 flex-wrap pt-2 border-top">
+            <a href="/admin/atividades/{{this.id}}" class="btn btn-eco-secondary btn-sm" title="Ver detalhes e itens">
+              <i class="bi bi-eye me-1"></i>Ver
+            </a>
+            <a href="/admin/atividades/{{this.id}}/editar" class="btn btn-eco-secondary btn-sm" title="Editar informações">
+              <i class="bi bi-pencil me-1"></i>Editar
+            </a>
+            
+            <!-- Botão Excluir Atividade -->
+            <button type="button" 
+                    class="btn btn-eco-danger btn-sm btn-excluir-atividade ms-auto"
+                    data-id="{{this.id}}"
+                    data-nome="{{this.nome}}"
+                    data-pode-excluir="{{this.podeExcluir}}"
+                    data-respostas="{{this.totalRespostas}}"
+                    title="Excluir atividade do sistema">
+              <i class="bi bi-trash me-1"></i>Excluir atividade
+            </button>
           </div>
         </div>
       </div>
@@ -28,8 +81,129 @@
   {{else}}
   <div class="eco-card text-center p-5">
     <div style="font-size:3rem;">📋</div>
-    <h5 class="mt-3 fw-bold">Nenhuma atividade pronta</h5>
-    <p class="text-muted">Crie atividades template para os professores usarem.</p>
+    <h5 class="mt-3 fw-bold">Nenhuma atividade cadastrada</h5>
+    <p class="text-muted">Crie atividades modelo para a plataforma ou aguarde a criação por professores.</p>
+    <a href="/admin/atividades/criar" class="btn btn-eco mt-2"><i class="bi bi-plus-lg me-1"></i>Criar Template</a>
   </div>
   {{/if}}
 </div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="modalConfirmarExclusao" tabindex="-1" aria-labelledby="modalConfirmarExclusaoLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-light">
+        <h5 class="modal-title fw-bold text-danger" id="modalConfirmarExclusaoLabel">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirmar Exclusão de Atividade
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body py-3">
+        <p class="mb-2">
+          Tem certeza de que deseja excluir permanentemente a atividade:
+        </p>
+        <p class="fs-5 fw-bold text-dark px-3 py-2 rounded bg-light border" id="modalNomeAtividade">
+          Nome da Atividade
+        </p>
+
+        <!-- Mensagem condicional caso haja alunos ou seja segura -->
+        <div id="modalAvisoBloqueio" class="alert alert-danger d-none mt-3 mb-0 small" role="alert">
+          <i class="bi bi-shield-lock-fill fs-5 me-2 align-middle"></i>
+          <span><strong>Exclusão Bloqueada:</strong> Esta atividade já possui <span id="modalQtdRespostas"></span> resposta(s) de alunos. Para preservar o histórico escolar e os resultados de aprendizagem, a atividade não pode ser excluída.</span>
+        </div>
+
+        <div id="modalAvisoSeguro" class="alert alert-warning mt-3 mb-0 small" role="alert">
+          <i class="bi bi-info-circle-fill me-1"></i>
+          <strong>Atenção:</strong> Esta ação removerá a atividade definitivamente do banco de dados, incluindo seus itens associados. Esta operação não poderá ser desfeita.
+        </div>
+      </div>
+      <div class="modal-footer bg-light border-0">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+          <i class="bi bi-x-circle me-1"></i>Cancelar
+        </button>
+        <form id="formExcluirAtividade" method="POST" action="" class="d-inline">
+          <button type="submit" id="btnConfirmarExclusaoSubmit" class="btn btn-danger btn-sm">
+            <i class="bi bi-trash-fill me-1"></i>Sim, Excluir Atividade
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // Configuração do Modal de Exclusão
+  const modalEl = document.getElementById('modalConfirmarExclusao');
+  let modalInstance = null;
+  if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+    modalInstance = new bootstrap.Modal(modalEl);
+  }
+
+  const modalNome = document.getElementById('modalNomeAtividade');
+  const modalAvisoBloqueio = document.getElementById('modalAvisoBloqueio');
+  const modalAvisoSeguro = document.getElementById('modalAvisoSeguro');
+  const modalQtdRespostas = document.getElementById('modalQtdRespostas');
+  const btnSubmit = document.getElementById('btnConfirmarExclusaoSubmit');
+  const formExclusao = document.getElementById('formExcluirAtividade');
+
+  document.querySelectorAll('.btn-excluir-atividade').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const id = this.getAttribute('data-id');
+      const nome = this.getAttribute('data-nome');
+      const podeExcluir = this.getAttribute('data-pode-excluir') === 'true';
+      const respostas = parseInt(this.getAttribute('data-respostas') || '0', 10);
+
+      modalNome.textContent = nome;
+      formExclusao.action = `/admin/atividades/${id}/excluir`;
+
+      if (!podeExcluir || respostas > 0) {
+        modalAvisoBloqueio.classList.remove('d-none');
+        modalAvisoSeguro.classList.add('d-none');
+        modalQtdRespostas.textContent = respostas;
+        btnSubmit.disabled = true;
+        btnSubmit.classList.add('disabled');
+      } else {
+        modalAvisoBloqueio.classList.add('d-none');
+        modalAvisoSeguro.classList.remove('d-none');
+        btnSubmit.disabled = false;
+        btnSubmit.classList.remove('disabled');
+      }
+
+      if (modalInstance) {
+        modalInstance.show();
+      } else {
+        // Fallback caso Bootstrap JS não esteja carregado
+        if (podeExcluir) {
+          if (confirm(`Tem certeza de que deseja excluir permanentemente a atividade "${nome}"?`)) {
+            formExclusao.submit();
+          }
+        } else {
+          alert(`Não é possível excluir a atividade "${nome}", pois ela possui ${respostas} registro(s) de participação de alunos.`);
+        }
+      }
+    });
+  });
+
+  // Filtros rápidos (Todas / Templates / Professores)
+  const filtroBtns = document.querySelectorAll('.filtro-btn');
+  const cards = document.querySelectorAll('.card-atividade-item');
+
+  filtroBtns.forEach(btn => {
+    btn.addEventListener('click', function () {
+      filtroBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      const filtro = this.getAttribute('data-filtro');
+
+      cards.forEach(card => {
+        const origem = card.getAttribute('data-origem');
+        if (filtro === 'todos' || origem === filtro) {
+          card.classList.remove('d-none');
+        } else {
+          card.classList.add('d-none');
+        }
+      });
+    });
+  });
+});
+</script>

@@ -23,18 +23,22 @@ const sessionStore = new SequelizeStore({
   expiration: 24 * 60 * 60 * 1000
 });
 
+// Suporte a HTTPS em produção e HTTP em redes locais / NAT escolar
+const isSecureCookie = process.env.COOKIE_SECURE === 'true' ||
+                       (process.env.NODE_ENV === 'production' && !!process.env.VERCEL);
+
 const sessionConfig = {
   secret: sessionSecret,
   store: sessionStore,
   resave: false,
   saveUninitialized: false,
+  proxy: true, // Habilita express-session a confiar em proxies e NAT para cookies
   cookie: {
     maxAge: 24 * 60 * 60 * 1000,
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: isSecureCookie ? true : 'auto',
     sameSite: 'lax'
   }
 };
 
 module.exports = { sessionConfig, sessionStore };
-
